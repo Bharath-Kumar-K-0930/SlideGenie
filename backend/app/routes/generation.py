@@ -22,7 +22,13 @@ async def generate_presentation(request: Request, payload: GenerateRequest):
     Accepts text and generates the presentation structure + output file.
     Rate Limit: 5 requests per minute per IP.
     """
+    from app.utils.logger import log_request, log_error
+    import time
+    
+    start_time = time.time()
+    
     if len(payload.text) > 2000:
+        log_request("/generate", "rejected_too_long", 0)
         raise HTTPException(status_code=400, detail="Text too long (max 2000 chars)")
         
     try:
@@ -50,6 +56,9 @@ async def generate_presentation(request: Request, payload: GenerateRequest):
         # Step 3: Encode to Base64
         file_base64 = base64.b64encode(file_buffer.getvalue()).decode('utf-8')
         
+        duration_ms = (time.time() - start_time) * 1000
+        log_request("/generate", "success", duration_ms)
+        
         return {
             "status": "success",
             "data": {
@@ -63,4 +72,7 @@ async def generate_presentation(request: Request, payload: GenerateRequest):
     except Exception as e:
         import traceback
         traceback.print_exc()
+        log_error(e, "generate_presentation")
+        duration_ms = (time.time() - start_time) * 1000
+        log_request("/generate", "error", duration_ms)
         raise HTTPException(status_code=500, detail=str(e))

@@ -52,3 +52,59 @@ npm run dev
 ## Health Check
 Backend: `http://localhost:8000/api/v1/health`
 Frontend: `http://localhost:3000`
+
+## Deployment
+
+See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
+
+### Quick Deploy
+
+**Backend (Render/Railway):**
+- Root Directory: `backend`
+- Build Command: `pip install -r requirements.txt`
+- Start Command: `uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+
+**Frontend (Vercel):**
+- Framework: Next.js
+- Root Directory: `frontend`
+- Build Command: `npm run build`
+- Output Directory: `.next`
+
+### Environment Variables
+
+**Backend:**
+```
+OPENAI_API_KEY=your_key_here
+PROJECT_NAME=SlideGenie AI
+VERSION=1.0.0
+```
+
+**Frontend:**
+```
+NEXT_PUBLIC_API_URL=https://your-backend-url.com/api/v1
+```
+
+## Testing
+
+Run backend tests:
+```bash
+cd backend
+python -m pytest tests -v
+```
+
+## Project Status
+
+✅ Phase 0-9 Complete
+- Design & Architecture
+- Tech Stack Setup
+- AI Content Engine
+- PPT/PDF Generation
+- Frontend UI/UX
+- API Integration
+- Security & Rate Limiting
+- Testing & QA
+- Deployment Ready
+
+## License
+
+MIT
