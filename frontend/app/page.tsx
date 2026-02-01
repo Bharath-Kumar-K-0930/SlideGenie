@@ -59,8 +59,8 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-start p-4 md:p-24 space-y-8">
       {/* Header */}
-      <header className="text-center space-y-4 max-w-2xl">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600">
+      <header className="text-center space-y-4 max-w-2xl fade-in">
+        <h1 className="text-4xl md:text-6xl font-bold tracking-tight gradient-text">
           SlideGenie AI
         </h1>
         <p className="text-lg text-gray-600">
@@ -69,7 +69,7 @@ export default function Home() {
       </header>
 
       {/* Main Card */}
-      <div className="w-full max-w-3xl glass rounded-2xl p-6 md:p-10 space-y-8">
+      <div className="w-full max-w-3xl glass rounded-2xl p-6 md:p-10 space-y-8 scale-in">
 
         {/* Input Area */}
         <div className="space-y-3">
@@ -137,9 +137,9 @@ export default function Home() {
         <button
           onClick={handleGenerate}
           disabled={loading || !text}
-          className={`w-full py-4 px-6 rounded-xl font-bold text-white text-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] shadow-lg ${loading
+          className={`w-full py-4 px-6 rounded-xl font-bold text-white text-lg smooth-transition shadow-lg ${loading
             ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:shadow-indigo-500/30'
+            : 'gradient-button glow'
             }`}
         >
           {loading ? (
@@ -164,7 +164,7 @@ export default function Home() {
         )}
 
         {success && !loading && (
-          <div className="p-4 rounded-lg bg-green-50 text-green-700 text-sm border border-green-100 flex items-center justify-between">
+          <div className="p-4 rounded-lg bg-green-50 text-green-700 text-sm border border-green-100 flex items-center justify-between success-pulse">
             <div className="flex items-center">
               <svg className="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
               <span>Success! Your file has been downloaded.</span>
