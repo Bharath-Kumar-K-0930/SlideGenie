@@ -20,7 +20,8 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 if settings.BACKEND_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS],
+        allow_origin_regex=r"https://.*\.vercel\.app",  # Allow all Vercel deployments
+        allow_origins=[str(origin) for origin in settings.BACKEND_CORS_ORIGINS if not origin.endswith("vercel.app")],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

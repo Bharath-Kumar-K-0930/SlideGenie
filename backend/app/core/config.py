@@ -6,10 +6,11 @@ class Settings(BaseSettings):
     VERSION: str = "0.1.0"
     API_V1_STR: str = "/api/v1"
     
-    # CORS Configuration
+    # CORS origins - add your Vercel deployment URL here
     BACKEND_CORS_ORIGINS: list[str] = [
         "http://localhost:3000",
         "http://localhost:8000",
+        "https://*.vercel.app",  # Allow all Vercel deployments
     ]
     
     # AI Config
