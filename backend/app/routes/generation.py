@@ -1,12 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 from typing import Literal
 import base64
 from app.services.content_engine import content_engine
 from app.services.ppt_generator import ppt_generator
 from app.services.pdf_generator import pdf_generator
+from app.core.limiter import limiter
 
 router = APIRouter()
+
 
 class GenerateRequest(BaseModel):
     text: str
@@ -14,9 +16,11 @@ class GenerateRequest(BaseModel):
     type: Literal["pptx", "pdf"] = "pptx"
 
 @router.post("/generate", tags=["generation"])
-async def generate_presentation(payload: GenerateRequest):
+@limiter.limit("5/minute")
+async def generate_presentation(request: Request, payload: GenerateRequest):
     """
     Accepts text and generates the presentation structure + output file.
+    Rate Limit: 5 requests per minute per IP.
     """
     if len(payload.text) > 2000:
         raise HTTPException(status_code=400, detail="Text too long (max 2000 chars)")
