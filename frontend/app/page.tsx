@@ -80,7 +80,8 @@ export default function Home() {
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value.substring(0, 2000))}
-            className="w-full h-48 p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition resize-none text-gray-800 bg-white/50"
+            className="w-full h-48 p-4 rounded-xl border border-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition resize-none text-gray-800"
+            style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}
             placeholder="Paste your notes, article, or topic idea here..."
             disabled={loading}
           />
