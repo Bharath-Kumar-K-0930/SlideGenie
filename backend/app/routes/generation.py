@@ -26,6 +26,9 @@ async def generate_presentation(payload: GenerateRequest):
         structure = await content_engine.generate_structure(payload.text, payload.slide_count)
         
         # Step 2: Generate File
+        # Offload CPU-bound work to threadpool to avoid blocking async event loop
+        import asyncio
+        
         file_buffer = None
         filename = "presentation.pptx"
         content_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
@@ -33,12 +36,12 @@ async def generate_presentation(payload: GenerateRequest):
         if payload.type == "pdf":
             filename = "presentation.pdf"
             content_type = "application/pdf"
-            file_buffer = pdf_generator.generate(structure)
+            file_buffer = await asyncio.to_thread(pdf_generator.generate, structure)
         else:
             # Default to PPTX
             filename = "presentation.pptx"
             content_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-            file_buffer = ppt_generator.generate(structure)
+            file_buffer = await asyncio.to_thread(ppt_generator.generate, structure)
         
         # Step 3: Encode to Base64
         file_base64 = base64.b64encode(file_buffer.getvalue()).decode('utf-8')

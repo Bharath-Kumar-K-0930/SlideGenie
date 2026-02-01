@@ -28,13 +28,25 @@ export const apiClient = {
     },
 
     generatePresentation: async (payload: GenerateRequest): Promise<GenerateResponse> => {
-        const res = await fetch(`${API_URL}/generate`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload),
-        });
-        return res.json();
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 60000); // 60s timeout
+
+        try {
+            const res = await fetch(`${API_URL}/generate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(payload),
+                signal: controller.signal,
+            });
+            clearTimeout(timeoutId);
+            return res.json();
+        } catch (error: any) {
+            if (error.name === 'AbortError') {
+                throw new Error('Request timed out. Please try again with less text or fewer slides.');
+            }
+            throw error;
+        }
     },
 };
