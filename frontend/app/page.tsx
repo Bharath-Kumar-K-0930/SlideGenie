@@ -78,7 +78,7 @@ export default function Home() {
       {/* Dark Mode Toggle */}
       <button
         onClick={() => setDarkMode(!darkMode)}
-        className="fixed top-6 right-6 z-50 social-link"
+        className="fixed top-4 right-4 md:top-6 md:right-6 z-50 social-link"
         aria-label="Toggle dark mode"
       >
         {darkMode ? (
@@ -95,30 +95,30 @@ export default function Home() {
       <div className="container-saas">
         {/* Hero Section */}
         <header className="section-spacing text-center fade-in">
-          <div className="flex items-center justify-center mb-6">
+          <div className="flex items-center justify-center mb-6 md:mb-8">
             <Image
               src="/logo.png"
               alt="SlideGenie AI Logo"
               width={64}
               height={64}
-              className="smooth-transition hover:scale-110"
+              className="smooth-transition hover:scale-110 w-16 h-16 md:w-20 md:h-20"
             />
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold mb-4 tracking-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 md:mb-6 tracking-tight px-4">
             <span className="gradient-text">SlideGenie AI</span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-slate-600 max-w-2xl mx-auto mb-6 font-light">
+          <p className="text-lg sm:text-xl md:text-2xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto mb-4 md:mb-6 font-light px-4">
             Turn text into professional presentations in seconds
           </p>
 
-          <p className="text-sm text-slate-500 max-w-xl mx-auto mb-8">
+          <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 max-w-xl mx-auto mb-8 md:mb-10 px-4">
             AI-powered PPT & PDF generator
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-wrap items-center justify-center gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 md:gap-4 mb-8 md:mb-10 px-4 max-w-md sm:max-w-none mx-auto">
             <button
               onClick={() => document.getElementById('generator')?.scrollIntoView({ behavior: 'smooth' })}
               className="btn-primary"
@@ -136,7 +136,7 @@ export default function Home() {
           </div>
 
           {/* Tech Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 px-4">
             <span className="badge badge-primary">Next.js</span>
             <span className="badge badge-primary">FastAPI</span>
             <span className="badge badge-accent">OpenAI</span>
@@ -145,13 +145,15 @@ export default function Home() {
         </header>
 
         {/* Generator Card */}
-        <section id="generator" className="max-w-3xl mx-auto mb-16 slide-up">
-          <div className="card-modern p-8 md:p-10">
-            <h2 className="text-2xl font-bold mb-6 text-slate-900">Create Your Presentation</h2>
+        <section id="generator" className="max-w-3xl mx-auto mb-12 md:mb-16 slide-up">
+          <div className="card-modern p-6 md:p-8 lg:p-10">
+            <h2 className="text-xl md:text-2xl font-bold mb-6 text-slate-900 dark:text-slate-100">
+              Create Your Presentation
+            </h2>
 
             {/* Textarea */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-700 mb-2">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                 Your Content
               </label>
               <textarea
@@ -168,8 +170,8 @@ export default function Home() {
 
             {/* Slider */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-700 mb-3">
-                Number of Slides: <span className="gradient-text font-bold">{slideCount}</span>
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                Number of Slides: <span className="gradient-text font-bold text-lg">{slideCount}</span>
               </label>
               <input
                 type="range"
@@ -179,7 +181,7 @@ export default function Home() {
                 onChange={(e) => setSlideCount(Number(e.target.value))}
                 className="slider-modern"
               />
-              <div className="flex justify-between text-xs text-slate-500 mt-2">
+              <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-2">
                 <span>1</span>
                 <span>15</span>
               </div>
@@ -187,21 +189,23 @@ export default function Home() {
 
             {/* Format Toggle */}
             <div className="mb-8">
-              <label className="block text-sm font-medium text-slate-700 mb-3">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
                 Output Format
               </label>
-              <div className="flex gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   onClick={() => setType("pptx")}
-                  className={`toggle-option flex-1 ${type === "pptx" ? "active" : ""}`}
+                  className={`toggle-option ${type === "pptx" ? "active" : ""}`}
                 >
-                  📊 PowerPoint (.pptx)
+                  <span>📊</span>
+                  <span>PowerPoint (.pptx)</span>
                 </button>
                 <button
                   onClick={() => setType("pdf")}
-                  className={`toggle-option flex-1 ${type === "pdf" ? "active" : ""}`}
+                  className={`toggle-option ${type === "pdf" ? "active" : ""}`}
                 >
-                  📄 PDF (.pdf)
+                  <span>📄</span>
+                  <span>PDF (.pdf)</span>
                 </button>
               </div>
             </div>
@@ -210,7 +214,7 @@ export default function Home() {
             <button
               onClick={handleGenerate}
               disabled={loading || !text.trim()}
-              className="btn-primary w-full text-lg py-4"
+              className="btn-primary w-full text-base md:text-lg py-3 md:py-4"
             >
               {loading ? (
                 <span className="flex items-center justify-center gap-3">
@@ -243,11 +247,11 @@ export default function Home() {
 
         {/* Features Section */}
         <section className="section-spacing">
-          <h2 className="text-3xl font-bold text-center mb-12">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-10 md:mb-12 px-4">
             Why <span className="gradient-text">SlideGenie AI</span>?
           </h2>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10 md:mb-12">
             {/* Feature 1 */}
             <div className="feature-card">
               <div className="icon-container mb-4">
@@ -255,8 +259,8 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-lg mb-2">⚡ Lightning Fast</h3>
-              <p className="text-sm text-slate-600">
+              <h3 className="font-semibold text-base md:text-lg mb-2">⚡ Lightning Fast</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Generate professional presentations in seconds, not hours
               </p>
             </div>
@@ -268,8 +272,8 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-lg mb-2">🤖 AI-Powered</h3>
-              <p className="text-sm text-slate-600">
+              <h3 className="font-semibold text-base md:text-lg mb-2">🤖 AI-Powered</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Advanced AI understands your content and creates structured slides
               </p>
             </div>
@@ -281,8 +285,8 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-lg mb-2">📄 PPT & PDF</h3>
-              <p className="text-sm text-slate-600">
+              <h3 className="font-semibold text-base md:text-lg mb-2">📄 PPT & PDF</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Export as PowerPoint (.pptx) or PDF – your choice!
               </p>
             </div>
@@ -294,26 +298,26 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
-              <h3 className="font-semibold text-lg mb-2">🔒 Secure & Private</h3>
-              <p className="text-sm text-slate-600">
+              <h3 className="font-semibold text-base md:text-lg mb-2">🔒 Secure & Private</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
                 Your data is processed securely and never stored
               </p>
             </div>
           </div>
 
           {/* Stats Strip */}
-          <div className="grid grid-cols-3 gap-4 max-w-2xl mx-auto">
+          <div className="grid grid-cols-3 gap-3 md:gap-4 max-w-2xl mx-auto">
             <div className="stat-card">
-              <div className="text-3xl font-bold gradient-text mb-1">2s</div>
-              <div className="text-sm text-slate-600">Avg. Time</div>
+              <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">2s</div>
+              <div className="text-xs md:text-sm text-slate-600 dark:text-slate-400">Avg. Time</div>
             </div>
             <div className="stat-card">
-              <div className="text-3xl font-bold gradient-text mb-1">15</div>
-              <div className="text-sm text-slate-600">Max Slides</div>
+              <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">15</div>
+              <div className="text-xs md:text-sm text-slate-600 dark:text-slate-400">Max Slides</div>
             </div>
             <div className="stat-card">
-              <div className="text-3xl font-bold gradient-text mb-1">2</div>
-              <div className="text-sm text-slate-600">Formats</div>
+              <div className="text-2xl md:text-3xl font-bold gradient-text mb-1">2</div>
+              <div className="text-xs md:text-sm text-slate-600 dark:text-slate-400">Formats</div>
             </div>
           </div>
         </section>
@@ -322,13 +326,13 @@ export default function Home() {
         <div className="divider"></div>
 
         {/* Footer */}
-        <footer className="py-12 text-center">
-          <p className="text-slate-600 mb-4">
+        <footer className="py-8 md:py-12 text-center">
+          <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 mb-4 px-4">
             Built with ❤️ by <span className="font-semibold gradient-text">Bharath Kumar K</span>
           </p>
 
           {/* Tech Stack */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 mb-6 px-4">
             <span className="tech-badge">Next.js 16</span>
             <span className="tech-badge">FastAPI</span>
             <span className="tech-badge">OpenAI GPT</span>
@@ -354,7 +358,7 @@ export default function Home() {
             </a>
           </div>
 
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-slate-500 dark:text-slate-400 px-4">
             © 2024 SlideGenie AI. All rights reserved. | Limit: 15 slides per run
           </p>
         </footer>
