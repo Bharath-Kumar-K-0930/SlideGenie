@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Literal
 import base64
 from app.services.content_engine import content_engine
@@ -12,7 +12,7 @@ router = APIRouter()
 
 class GenerateRequest(BaseModel):
     text: str
-    slide_count: int = 5
+    slideCount: int = Field(default=5, ge=1, le=15)  # Between 1 and 15
     type: Literal["pptx", "pdf"] = "pptx"
 
 @router.post("/generate", tags=["generation"])
@@ -33,7 +33,7 @@ async def generate_presentation(request: Request, payload: GenerateRequest):
         
     try:
         # Step 1: AI Structure Generation
-        structure = await content_engine.generate_structure(payload.text, payload.slide_count)
+        structure = await content_engine.generate_structure(payload.text, payload.slideCount)
         
         # Step 2: Generate File
         # Offload CPU-bound work to threadpool to avoid blocking async event loop
