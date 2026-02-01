@@ -67,15 +67,22 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen relative">
+    <main className="min-h-screen relative overflow-hidden cyber-grid">
+      {/* Animated Background Blobs */}
+      <div className="fixed top-0 left-0 w-full h-full pointer-events-none z-0">
+        <div className="absolute top-20 left-10 w-96 h-96 bg-cyan-400 opacity-10 blur-3xl blob"></div>
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-red-400 opacity-10 blur-3xl blob" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-blue-900 opacity-10 blur-3xl blob" style={{ animationDelay: '4s' }}></div>
+      </div>
+
       {/* Dark Mode Toggle */}
       <button
         onClick={() => setDarkMode(!darkMode)}
-        className="fixed top-8 right-8 z-50 p-4 rounded-full glass hover:scale-110 smooth-transition shadow-lg"
+        className="fixed top-8 right-8 z-50 p-4 rounded-2xl glass-modern hover:scale-110 smooth-transition neon-border"
         aria-label="Toggle dark mode"
       >
         {darkMode ? (
-          <svg className="w-6 h-6 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+          <svg className="w-6 h-6 text-yellow-400 neon-cyan" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" clipRule="evenodd" />
           </svg>
         ) : (
@@ -86,160 +93,176 @@ export default function Home() {
       </button>
 
       {/* Hero Section */}
-      <div className="container mx-auto px-4 py-16 md:py-24">
-        <div className="max-w-6xl mx-auto">
+      <div className="container-modern relative z-10 py-16 md:py-24">
+        <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <header className="text-center mb-16 fade-in">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <Image
-                src="/logo.png"
-                alt="SlideGenie AI Logo"
-                width={100}
-                height={100}
-                className="drop-shadow-2xl"
-              />
+          <header className="text-center mb-20 fade-in">
+            <div className="flex items-center justify-center gap-4 mb-8 float-animation">
+              <div className="pulse-ring">
+                <Image
+                  src="/logo.png"
+                  alt="SlideGenie AI Logo"
+                  width={120}
+                  height={120}
+                  className="drop-shadow-2xl"
+                />
+              </div>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight gradient-text mb-6">
-              SlideGenie AI
+            <h1 className="text-6xl md:text-8xl font-bold tracking-tight mb-6 cyber-text">
+              <span className="gradient-text neon-cyan">SlideGenie AI</span>
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Transform your ideas into stunning presentations in seconds with the power of AI
+            <p className="text-xl md:text-3xl text-gray-600 max-w-4xl mx-auto leading-relaxed font-light">
+              Transform your ideas into <span className="neon-underline font-semibold text-cyan-600">stunning presentations</span> in seconds with the power of AI
             </p>
+
+            {/* Tech Stack Badges */}
+            <div className="flex flex-wrap justify-center gap-4 mt-10">
+              <span className="px-6 py-2 rounded-full glass-modern text-sm font-semibold neon-border cyber-text">HTML5</span>
+              <span className="px-6 py-2 rounded-full glass-modern text-sm font-semibold neon-border cyber-text">CSS3</span>
+              <span className="px-6 py-2 rounded-full glass-modern text-sm font-semibold neon-border cyber-text">Web3</span>
+              <span className="px-6 py-2 rounded-full glass-modern text-sm font-semibold neon-border cyber-text">AI-Powered</span>
+            </div>
           </header>
 
           {/* Main Content Grid */}
-          <div className="grid lg:grid-cols-2 gap-8 items-start">
+          <div className="grid lg:grid-cols-2 gap-10 items-start">
             {/* Left Column - Form */}
-            <div className="glass rounded-3xl p-8 md:p-10 space-y-8 scale-in">
-              <div className="space-y-2">
-                <h2 className="text-2xl font-bold text-gray-800">Create Your Presentation</h2>
-                <p className="text-gray-600">Enter your content and let AI do the magic ✨</p>
-              </div>
+            <div className="glass-modern rounded-3xl p-8 md:p-10 space-y-8 scale-in card-3d perspective-card holographic">
+              <div className="perspective-card-inner">
+                <div className="space-y-2">
+                  <h2 className="text-3xl font-bold text-gray-800 cyber-text">
+                    <span className="neon-underline">Create Your Presentation</span>
+                  </h2>
+                  <p className="text-gray-600 text-lg">Enter your content and let AI do the magic ✨</p>
+                </div>
 
-              {/* Input Area */}
-              <div className="space-y-3">
-                <label className="block text-sm font-semibold text-gray-700">
-                  Your Content
-                  <span className="text-gray-400 font-normal ml-2">({text.length}/2000 chars)</span>
-                </label>
-                <textarea
-                  value={text}
-                  onChange={(e) => setText(e.target.value.substring(0, 2000))}
-                  className="w-full h-56 p-5 rounded-2xl border-2 border-gray-200 focus:ring-2 focus:ring-cyan-400 focus:border-transparent outline-none smooth-transition resize-none text-gray-800 text-lg"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.7)' }}
-                  placeholder="Paste your notes, article, or topic idea here...
+                {/* Input Area */}
+                <div className="space-y-3">
+                  <label className="block text-sm font-semibold text-gray-700">
+                    Your Content
+                    <span className="text-gray-400 font-normal ml-2">({text.length}/2000 chars)</span>
+                  </label>
+                  <textarea
+                    value={text}
+                    onChange={(e) => setText(e.target.value.substring(0, 2000))}
+                    className="w-full h-56 p-5 rounded-2xl border-2 border-gray-200 focus:ring-2 focus:ring-cyan-400 focus:border-transparent outline-none smooth-transition resize-none text-gray-800 text-lg"
+                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.7)' }}
+                    placeholder="Paste your notes, article, or topic idea here...
 
 Example: 'The future of renewable energy, including solar power advancements, wind energy innovations, and sustainable practices for 2024.'"
-                  disabled={loading}
-                />
-              </div>
-
-              {/* Controls */}
-              <div className="space-y-6">
-                {/* Slide Count */}
-                <div className="space-y-4">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Number of Slides: <span className="text-cyan-600 text-xl">{slideCount}</span>
-                  </label>
-                  <input
-                    type="range"
-                    min="1"
-                    max="15"
-                    value={slideCount}
-                    onChange={(e) => setSlideCount(parseInt(e.target.value))}
-                    className="w-full h-3 bg-gradient-to-r from-cyan-200 to-cyan-400 rounded-lg appearance-none cursor-pointer accent-cyan-600"
                     disabled={loading}
                   />
-                  <div className="flex justify-between text-xs text-gray-500 font-medium">
-                    <span>1 slide</span>
-                    <span>15 slides</span>
-                  </div>
                 </div>
 
-                {/* Type Toggle */}
-                <div className="space-y-3">
-                  <label className="block text-sm font-semibold text-gray-700">Output Format</label>
-                  <div className="grid grid-cols-2 gap-4">
-                    <button
-                      onClick={() => setType('pptx')}
-                      className={`py-4 px-6 text-base font-semibold rounded-xl smooth-transition ${type === 'pptx'
+                {/* Controls */}
+                <div className="space-y-6">
+                  {/* Slide Count */}
+                  <div className="space-y-4">
+                    <label className="block text-sm font-semibold text-gray-700">
+                      Number of Slides: <span className="text-cyan-600 text-xl">{slideCount}</span>
+                    </label>
+                    <input
+                      type="range"
+                      min="1"
+                      max="15"
+                      value={slideCount}
+                      onChange={(e) => setSlideCount(parseInt(e.target.value))}
+                      className="w-full h-3 bg-gradient-to-r from-cyan-200 to-cyan-400 rounded-lg appearance-none cursor-pointer accent-cyan-600"
+                      disabled={loading}
+                    />
+                    <div className="flex justify-between text-xs text-gray-500 font-medium">
+                      <span>1 slide</span>
+                      <span>15 slides</span>
+                    </div>
+                  </div>
+
+                  {/* Type Toggle */}
+                  <div className="space-y-3">
+                    <label className="block text-sm font-semibold text-gray-700">Output Format</label>
+                    <div className="grid grid-cols-2 gap-4">
+                      <button
+                        onClick={() => setType('pptx')}
+                        className={`py-4 px-6 text-base font-semibold rounded-xl smooth-transition ${type === 'pptx'
                           ? 'bg-gradient-to-r from-cyan-500 to-cyan-600 text-white shadow-lg scale-105'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                      disabled={loading}
-                    >
-                      📊 PowerPoint
-                    </button>
-                    <button
-                      onClick={() => setType('pdf')}
-                      className={`py-4 px-6 text-base font-semibold rounded-xl smooth-transition ${type === 'pdf'
+                          }`}
+                        disabled={loading}
+                      >
+                        📊 PowerPoint
+                      </button>
+                      <button
+                        onClick={() => setType('pdf')}
+                        className={`py-4 px-6 text-base font-semibold rounded-xl smooth-transition ${type === 'pdf'
                           ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-lg scale-105'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                        }`}
-                      disabled={loading}
+                          }`}
+                        disabled={loading}
+                      >
+                        📄 PDF
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <button
+                  onClick={handleGenerate}
+                  disabled={loading || !text}
+                  className={`w-full py-6 px-8 rounded-2xl font-bold text-lg smooth-transition shadow-2xl cyber-text ${loading || !text
+                    ? 'bg-gray-400 cursor-not-allowed text-white'
+                    : 'gradient-button glow neon-button hover:scale-105'
+                    }`}
+                >
+                  {loading ? (
+                    <span className="flex items-center justify-center space-x-3">
+                      <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Creating Magic...</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center space-x-2">
+                      <span>✨ Generate Presentation</span>
+                    </span>
+                  )}
+                </button>
+
+                {/* Feedback Messages */}
+                {error && (
+                  <div className="p-5 rounded-xl bg-red-50 text-red-700 text-sm border-2 border-red-100 flex items-start gap-3 fade-in">
+                    <svg className="w-6 h-6 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                {success && !loading && (
+                  <div className="p-5 rounded-xl bg-green-50 text-green-700 text-sm border-2 border-green-100 flex items-center justify-between success-pulse fade-in">
+                    <div className="flex items-center gap-3">
+                      <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="font-medium">Success! Your file has been downloaded.</span>
+                    </div>
+                    <button
+                      onClick={() => triggerDownload(success.data!.fileBase64, success.data!.filename, success.data!.contentType)}
+                      className="text-green-800 hover:text-green-900 font-semibold underline"
                     >
-                      📄 PDF
+                      Download Again
                     </button>
                   </div>
-                </div>
-              </div>
-
-              {/* Action Button */}
-              <button
-                onClick={handleGenerate}
-                disabled={loading || !text}
-                className={`w-full py-5 px-8 rounded-2xl font-bold text-white text-lg smooth-transition shadow-xl ${loading || !text
-                    ? 'bg-gray-400 cursor-not-allowed'
-                    : 'gradient-button glow hover:scale-105'
-                  }`}
-              >
-                {loading ? (
-                  <span className="flex items-center justify-center space-x-3">
-                    <svg className="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    <span>Creating Magic...</span>
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center space-x-2">
-                    <span>✨ Generate Presentation</span>
-                  </span>
                 )}
-              </button>
-
-              {/* Feedback Messages */}
-              {error && (
-                <div className="p-5 rounded-xl bg-red-50 text-red-700 text-sm border-2 border-red-100 flex items-start gap-3 fade-in">
-                  <svg className="w-6 h-6 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <span>{error}</span>
-                </div>
-              )}
-
-              {success && !loading && (
-                <div className="p-5 rounded-xl bg-green-50 text-green-700 text-sm border-2 border-green-100 flex items-center justify-between success-pulse fade-in">
-                  <div className="flex items-center gap-3">
-                    <svg className="w-6 h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span className="font-medium">Success! Your file has been downloaded.</span>
-                  </div>
-                  <button
-                    onClick={() => triggerDownload(success.data!.fileBase64, success.data!.filename, success.data!.contentType)}
-                    className="text-green-800 hover:text-green-900 font-semibold underline"
-                  >
-                    Download Again
-                  </button>
-                </div>
-              )}
+              </div>
             </div>
 
             {/* Right Column - Features */}
             <div className="space-y-6 fade-in">
-              <div className="glass rounded-3xl p-8">
-                <h3 className="text-2xl font-bold mb-6 gradient-text">Why SlideGenie AI?</h3>
+              <div className="glass-modern rounded-3xl p-8 card-3d liquid">
+                <h3 className="text-3xl font-bold mb-8 cyber-text">
+                  <span className="gradient-text neon-cyan">Why SlideGenie AI?</span>
+                </h3>
                 <div className="space-y-5">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-cyan-600 flex items-center justify-center flex-shrink-0">
@@ -293,17 +316,17 @@ Example: 'The future of renewable energy, including solar power advancements, wi
 
               {/* Stats */}
               <div className="grid grid-cols-3 gap-4">
-                <div className="glass rounded-2xl p-6 text-center">
-                  <div className="text-3xl font-bold gradient-text mb-1">2s</div>
-                  <div className="text-sm text-gray-600">Avg. Time</div>
+                <div className="glass-modern rounded-2xl p-6 text-center card-3d neon-border">
+                  <div className="text-4xl font-bold gradient-text neon-cyan mb-2">2s</div>
+                  <div className="text-sm text-gray-600 font-semibold">Avg. Time</div>
                 </div>
-                <div className="glass rounded-2xl p-6 text-center">
-                  <div className="text-3xl font-bold gradient-text mb-1">15</div>
-                  <div className="text-sm text-gray-600">Max Slides</div>
+                <div className="glass-modern rounded-2xl p-6 text-center card-3d neon-border">
+                  <div className="text-4xl font-bold gradient-text neon-cyan mb-2">15</div>
+                  <div className="text-sm text-gray-600 font-semibold">Max Slides</div>
                 </div>
-                <div className="glass rounded-2xl p-6 text-center">
-                  <div className="text-3xl font-bold gradient-text mb-1">2</div>
-                  <div className="text-sm text-gray-600">Formats</div>
+                <div className="glass-modern rounded-2xl p-6 text-center card-3d neon-border">
+                  <div className="text-4xl font-bold gradient-text neon-cyan mb-2">2</div>
+                  <div className="text-sm text-gray-600 font-semibold">Formats</div>
                 </div>
               </div>
             </div>
