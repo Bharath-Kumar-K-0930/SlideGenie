@@ -4,6 +4,7 @@ from typing import Literal
 import base64
 from app.services.content_engine import content_engine
 from app.services.ppt_generator import ppt_generator
+from app.services.pdf_generator import pdf_generator
 
 router = APIRouter()
 
@@ -29,12 +30,14 @@ async def generate_presentation(payload: GenerateRequest):
         filename = "presentation.pptx"
         content_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
 
-        if payload.type == "pptx":
-            file_buffer = ppt_generator.generate(structure)
+        if payload.type == "pdf":
+            filename = "presentation.pdf"
+            content_type = "application/pdf"
+            file_buffer = pdf_generator.generate(structure)
         else:
-            # Placeholder for PDF (Phase 4)
-            # For now, default to PPTX logic or throw not implemented
-            # But let's fallback to PPTX for safety in Phase 3
+            # Default to PPTX
+            filename = "presentation.pptx"
+            content_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
             file_buffer = ppt_generator.generate(structure)
         
         # Step 3: Encode to Base64
