@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routes import health
+from app.routes import health, generation
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -20,6 +20,7 @@ if settings.BACKEND_CORS_ORIGINS:
     )
 
 app.include_router(health.router, prefix=settings.API_V1_STR)
+app.include_router(generation.router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 def root():

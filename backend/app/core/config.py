@@ -11,6 +11,9 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://localhost:8000",
     ]
+    
+    # AI Config
+    OPENAI_API_KEY: str | None = None
 
     class Config:
         case_sensitive = True
