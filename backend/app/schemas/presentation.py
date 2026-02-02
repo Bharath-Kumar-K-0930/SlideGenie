@@ -4,6 +4,7 @@ from typing import List, Optional
 class Slide(BaseModel):
     title: str = Field(description="The title of the slide")
     points: List[str] = Field(description="List of bullet points for the slide", max_length=5)
+    image_url: Optional[str] = Field(default=None, description="Optional URL for a slide image")
 
 class PlanSection(BaseModel):
     section_title: str

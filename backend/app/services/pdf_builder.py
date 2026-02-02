@@ -1,4 +1,7 @@
 from reportlab.lib import colors
+import logging
+
+logger = logging.getLogger(__name__)
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -64,27 +67,43 @@ class PDFGenerator:
             # Section Title
             story.append(Paragraph(slide.title, self.heading_style))
             
+            # Content Container (Table for Image + Text)
+            # If image exists, we'll use a table to put them side-by-side
+            
             # Bullet Points
             list_items = []
             for point in slide.points:
                 item = ListItem(Paragraph(point, self.bullet_style), bulletColor=colors.black)
                 list_items.append(item)
             
-            # Add list to story
-            story.append(
-                ListFlowable(
-                    list_items,
-                    bulletType='bullet',
-                    start='circle',
-                    leftIndent=20
-                )
+            bullets = ListFlowable(
+                list_items,
+                bulletType='bullet',
+                start='circle',
+                leftIndent=20
             )
+
+            story.append(bullets)
             
-            # Spacer between sections (logic for page breaks could go here if strict 1-slide-per-page is needed)
-            # For now, we allow flow but add spacing
+            # Add Image if present (simplified: just below text in PDF)
+            if slide.image_url:
+                try:
+                    from reportlab.platypus import Image as RLImage
+                    story.append(Spacer(1, 0.2 * inch))
+                    # Use a standard width to prevent overflow
+                    img = RLImage(slide.image_url, width=4*inch, height=2.5*inch)
+                    story.append(img)
+                except Exception as e:
+                    logger.error(f"Failed to add image to PDF: {e}")
+
             story.append(Spacer(1, 0.3 * inch))
 
-        # 3. Build PDF
+        # 3. Final Closing
+        story.append(Spacer(1, 0.5 * inch))
+        story.append(Paragraph("Thank You for using SlideGenie AI!", self.styles['Heading2']))
+        story.append(Paragraph("Innovating your presentation workflow with AI.", self.styles['Italic']))
+
+        # 4. Build PDF
         doc.build(story)
         buffer.seek(0)
         

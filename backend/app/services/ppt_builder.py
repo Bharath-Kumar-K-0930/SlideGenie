@@ -3,11 +3,17 @@ from pptx.util import Inches, Pt
 from pptx.enum.text import PP_ALIGN
 from app.schemas.presentation import PresentationStructure
 import io
+import requests
+import logging
+
+logger = logging.getLogger(__name__)
 
 class PPTGenerator:
     def __init__(self):
         self.LAYOUT_TITLE = 0
         self.LAYOUT_CONTENT = 1
+        self.LAYOUT_TITLE_AND_CONTENT = 1
+        self.LAYOUT_TWO_COLUMN = 3 # Typically 3 in default template
 
     def generate(self, structure: PresentationStructure) -> io.BytesIO:
         """
@@ -29,7 +35,13 @@ class PPTGenerator:
 
         # 2. Content Slides
         for slide_data in structure.slides:
-            slide_layout = prs.slide_layouts[self.LAYOUT_CONTENT]
+            # Use two-column layout if image is present, else standard content
+            if slide_data.image_url:
+                # We'll use a standard layout and manually position image
+                slide_layout = prs.slide_layouts[self.LAYOUT_TITLE_AND_CONTENT]
+            else:
+                slide_layout = prs.slide_layouts[self.LAYOUT_CONTENT]
+                
             slide = prs.slides.add_slide(slide_layout)
 
             # Title
@@ -37,24 +49,50 @@ class PPTGenerator:
             title_shape.text = slide_data.title
 
             # Content (Bullets)
-            # Find the body placeholder (usually idx 1 in standard layout)
             body_shape = slide.placeholders[1]
+            
+            # If image, resize the body placeholder to the left half
+            if slide_data.image_url:
+                body_shape.width = Inches(4.5)
+                body_shape.left = Inches(0.5)
+            
             tf = body_shape.text_frame
             tf.word_wrap = True
-
-            # Clear existing empty paragraphs if any or just start adding
             tf.clear() 
 
             for point in slide_data.points:
                 p = tf.add_paragraph()
                 p.text = point
                 p.level = 0
-                
-                # Basic Formatting
                 p.font.size = Pt(18)
                 p.space_after = Pt(10)
 
-        # 3. Save to memory
+            # Add Image if present
+            if slide_data.image_url:
+                try:
+                    response = requests.get(slide_data.image_url)
+                    if response.status_code == 200:
+                        image_stream = io.BytesIO(response.content)
+                        # Position image on the right
+                        # left, top, width, height
+                        slide.shapes.add_picture(
+                            image_stream, 
+                            left=Inches(5.5), 
+                            top=Inches(1.5), 
+                            width=Inches(3.5)
+                        )
+                except Exception as e:
+                    logger.error(f"Failed to add image to PPT: {e}")
+
+        # 3. Final Thank You Slide
+        end_layout = prs.slide_layouts[self.LAYOUT_TITLE]
+        end_slide = prs.slides.add_slide(end_layout)
+        end_title = end_slide.shapes.title
+        end_title.text = "Thank You!"
+        end_subtitle = end_slide.placeholders[1]
+        end_subtitle.text = "Created with SlideGenie AI\nInnovating Presentations with AI"
+
+        # 4. Save to memory
         output = io.BytesIO()
         prs.save(output)
         output.seek(0)

@@ -14,6 +14,8 @@ export default function Home() {
   const [audience, setAudience] = useState<"general" | "technical">("general");
   const [domain, setDomain] = useState<"general" | "technical" | "mathematics" | "law" | "medicine">("general");
   const [improvingPrompt, setImprovingPrompt] = useState(false);
+  const [generatedData, setGeneratedData] = useState<any>(null);
+  const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
@@ -83,20 +85,32 @@ export default function Home() {
       }
 
       const data = await response.json();
+      setGeneratedData(data.data);
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 5000);
-
-      // Trigger download
-      const link = document.createElement("a");
-      link.href = `data:${data.data.contentType};base64,${data.data.fileBase64}`;
-      link.download = data.data.filename;
-      link.click();
+      setActiveSlide(0);
     } catch (err: any) {
       setError(err.message || "Something went wrong");
       setTimeout(() => setError(""), 5000);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDownload = () => {
+    if (!generatedData) return;
+
+    const link = document.createElement("a");
+    link.href = `data:${generatedData.contentType};base64,${generatedData.fileBase64}`;
+    link.download = generatedData.filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleRedesign = () => {
+    setGeneratedData(null);
+    setSuccess(false);
+    setActiveSlide(0);
   };
 
   const charCount = text.length;
@@ -290,13 +304,13 @@ export default function Home() {
                   className="textarea"
                   maxLength={maxChars}
                 />
-                <div style={{
+                <div className="flex justify-between" style={{
                   fontSize: '0.75rem',
                   color: 'var(--color-text-muted)',
-                  textAlign: 'right',
                   marginTop: 'var(--spacing-xs)'
                 }}>
-                  {charCount} / {maxChars} characters
+                  <span>{charCount < 10 && text.trim().length > 0 ? "⚠️ Needs at least 10 chars" : ""}</span>
+                  <span>{charCount} / {maxChars} characters</span>
                 </div>
                 <p style={{
                   fontSize: '0.8125rem',
@@ -386,7 +400,7 @@ export default function Home() {
               {/* Generate Button */}
               <button
                 onClick={handleGenerate}
-                disabled={loading || !text.trim()}
+                disabled={loading || text.trim().length < 10}
                 className="btn btn-primary btn-lg"
                 style={{ width: '100%' }}
               >
@@ -396,7 +410,7 @@ export default function Home() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    <span>Generating...</span>
+                    <span>AI is Thinking & Planning...</span>
                   </>
                 ) : (
                   <>
@@ -415,9 +429,71 @@ export default function Home() {
                 </div>
               )}
 
-              {success && (
-                <div className="alert alert-success" style={{ marginTop: 'var(--spacing-lg)' }}>
-                  ✓ Success! Your file has been downloaded.
+              {/* Preview & Success State */}
+              {generatedData && (
+                <div style={{ marginTop: 'var(--spacing-xl)' }}>
+                  <div className="card" style={{ padding: 'var(--spacing-lg)', background: 'var(--color-bg-secondary)', border: '2px solid var(--color-primary)' }}>
+                    <div className="flex items-center justify-between mb-md">
+                      <h4 style={{ margin: 0 }}>Slide Preview ({activeSlide + 1} / {generatedData.structure.slides.length})</h4>
+                      <div className="flex gap-sm">
+                        <button
+                          onClick={() => setActiveSlide(Math.max(0, activeSlide - 1))}
+                          className="btn btn-secondary btn-sm"
+                          disabled={activeSlide === 0}
+                        >
+                          ←
+                        </button>
+                        <button
+                          onClick={() => setActiveSlide(Math.min(generatedData.structure.slides.length - 1, activeSlide + 1))}
+                          className="btn btn-secondary btn-sm"
+                          disabled={activeSlide === generatedData.structure.slides.length - 1}
+                        >
+                          →
+                        </button>
+                      </div>
+                    </div>
+
+                    <div style={{
+                      aspectRatio: '16/9',
+                      background: 'var(--color-bg)',
+                      borderRadius: 'var(--radius-md)',
+                      padding: 'var(--spacing-lg)',
+                      boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      display: 'flex',
+                      flexDirection: 'column'
+                    }}>
+                      <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary)', marginBottom: 'var(--spacing-md)' }}>
+                        {generatedData.structure.slides[activeSlide].title}
+                      </h3>
+                      <div className="flex gap-lg" style={{ flex: 1 }}>
+                        <ul style={{ flex: 2, paddingLeft: 'var(--spacing-lg)' }}>
+                          {generatedData.structure.slides[activeSlide].points.map((p: string, i: number) => (
+                            <li key={i} style={{ fontSize: '0.875rem', marginBottom: 'var(--spacing-xs)' }}>{p}</li>
+                          ))}
+                        </ul>
+                        {generatedData.structure.slides[activeSlide].image_url && (
+                          <div style={{ flex: 1.5, position: 'relative', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
+                            <img
+                              src={generatedData.structure.slides[activeSlide].image_url}
+                              alt="Slide visual"
+                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-2 gap-md" style={{ marginTop: 'var(--spacing-lg)' }}>
+                      <button onClick={handleDownload} className="btn btn-primary">
+                        📥 Download {generatedData.filename.endsWith('.pdf') ? 'PDF' : 'PPTX'}
+                      </button>
+                      <button onClick={handleRedesign} className="btn btn-secondary">
+                        🎨 Redesign / Edit
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>

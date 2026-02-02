@@ -78,12 +78,12 @@ async def generate_presentation(request: Request, payload: GenerateRequest):
         log_request("/generate", "success", duration_ms)
         
         return {
-            "status": "success",
+            "status": "success", 
             "data": {
+                "fileBase64": file_base64,
                 "filename": filename,
                 "contentType": content_type,
-                "fileBase64": file_base64,
-                "structure": structure.model_dump() # Optional: return structure for debug/preview
+                "structure": structure.dict()
             }
         }
         
