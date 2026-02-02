@@ -367,7 +367,7 @@ export default function Home() {
               </a>
 
               <a
-                href="https://linkedin.com/in/bharath-kumar-k"
+                href="https://www.linkedin.com/in/bharath-kumar-k-b35ba0304"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="social-icon-btn linkedin"
@@ -379,7 +379,7 @@ export default function Home() {
               </a>
 
               <a
-                href="mailto:bharathkumark0930@gmail.com"
+                href="mailto:bharathkumatkbk10@gmail.com"
                 className="social-icon-btn email"
                 title="Email"
               >
@@ -389,7 +389,7 @@ export default function Home() {
               </a>
 
               <a
-                href="https://leetcode.com/u/bharathkumark0930/"
+                href="https://leetcode.com/u/Bharath_Kumar_K_91/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="social-icon-btn leetcode"
@@ -401,14 +401,14 @@ export default function Home() {
               </a>
 
               <a
-                href="https://bharath-kumar-k-0930.github.io/portfolio/"
+                href="https://bharath-kumar-k-0930.github.io/My_Portfolio_website/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="social-icon-btn portfolio"
                 title="Portfolio"
               >
                 <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 019-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                 </svg>
               </a>
             </div>
