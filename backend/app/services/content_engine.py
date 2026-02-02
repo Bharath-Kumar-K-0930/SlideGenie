@@ -1,14 +1,25 @@
 import json
 import logging
-from typing import Optional
+from typing import Optional, List
 import asyncio
 from openai import AsyncOpenAI
 from app.core.config import settings
-from app.core.prompts import SYSTEM_PROMPT
-from app.schemas.presentation import PresentationStructure
+from app.core.prompts import CONCEPT_EXTRACTION_PROMPT, FINAL_PPT_SLIDE_PROMPT
+from app.schemas.presentation import PresentationStructure, ConceptPlan
 
 # Setup logger
 logger = logging.getLogger(__name__)
+
+FORBIDDEN_WORDS = [
+    "key aspect",
+    "important detail",
+    "topic:",
+    "supporting evidence",
+    "placeholder",
+    "insert here",
+    "specific detail",
+    "generic concept"
+]
 
 class ContentEngine:
     def __init__(self):
@@ -21,79 +32,127 @@ class ContentEngine:
 
     async def generate_structure(self, text: str, slide_count: int = 5) -> PresentationStructure:
         """
-        Generates structured JSON content for slides using AI.
-        Includes retry logic for malformed JSON and schema validation.
+        Generates structured JSON content for slides using a 2-step AI chain.
+        Step 1: Concept Understanding (Analyze concept & Extract subtopics)
+        Step 2: Slide Expansion (Generate detailed content per subtopic)
         """
+        # Step 0: Handle MOCK_AI or missing client
         if not self.client or settings.MOCK_AI:
-            # Fallback or Mock for testing without API Key or if forced
             logger.info("Using MOCK AI response")
-            await asyncio.sleep(1.5) # Simulate AI thinking delay
+            await asyncio.sleep(1.5)
             return self._get_mock_response(slide_count, text)
 
-        prompt = f"{SYSTEM_PROMPT.format(slide_count=slide_count)}\n\n{text}"
+        # Step 1: Auto-enhance weak input if needed (Slightly improved input internally)
+        input_text = text
+        if len(text) < 150:
+             logger.info("Short input detected, AI will expand internally during concept extraction.")
+
+        try:
+            # Step 1: Concept Extraction Phase
+            concept_plan = await self._analyze_concept(input_text, slide_count)
+            logger.info(f"Analyzed Concept: {concept_plan.main_topic}")
+
+            # Step 2: Slide Generation Phase
+            presentation = await self._generate_slides(concept_plan, slide_count)
+            
+            # Step 3: Backend Validation Guard
+            if self._contains_forbidden_words(presentation):
+                logger.warning("Forbidden words detected. Retrying with stricter constraints...")
+                presentation = await self._generate_slides(concept_plan, slide_count, stricter=True)
+
+            # Final check/cleanup
+            if len(presentation.slides) > 15:
+                presentation.slides = presentation.slides[:15]
+            if len(presentation.slides) < slide_count:
+                logger.warning(f"AI returned fewer slides than requested ({len(presentation.slides)}/{slide_count})")
+            
+            return presentation
+
+        except Exception as e:
+            logger.error(f"Generation Chain Error: {e}")
+            raise e
+
+    async def _analyze_concept(self, text: str, slide_count: int) -> ConceptPlan:
+        """Step 1: Analyzes user input to create a structured plan."""
+        prompt = CONCEPT_EXTRACTION_PROMPT.format(slide_count=slide_count)
         
-        retries = 3
-        for attempt in range(retries):
-            try:
-                response = await self.client.chat.completions.create(
-                    model="gpt-3.5-turbo-1106", # Efficient model with JSON mode support
-                    messages=[
-                        {"role": "system", "content": "You are a helpful assistant designed to output JSON."},
-                        {"role": "user", "content": prompt}
-                    ],
-                    response_format={"type": "json_object"},
-                    temperature=0.7,
-                )
-
-                content = response.choices[0].message.content
-                if not content:
-                    raise ValueError("Empty response from AI")
-
-                # Parse JSON
-                data = json.loads(content)
-                
-                # Validate against Pydantic Schema
-                presentation = PresentationStructure(**data)
-                
-                # Double check slide count constraint (soft check)
-                if len(presentation.slides) > 15:
-                     presentation.slides = presentation.slides[:15]
-                
-                return presentation
-
-            except json.JSONDecodeError as e:
-                logger.error(f"JSON Parse Error (Attempt {attempt+1}/{retries}): {e}")
-                continue # Retry
-            except Exception as e:
-                logger.error(f"AI Generation Error (Attempt {attempt+1}/{retries}): {e}")
-                if attempt == retries - 1:
-                    raise e
+        response = await self.client.chat.completions.create(
+            model="gpt-3.5-turbo-1106", # Efficient for JSON extraction
+            messages=[
+                {"role": "system", "content": "You are a senior subject-matter analyst. Output valid JSON only."},
+                {"role": "user", "content": f"{prompt}\n\nUSER INPUT:\n\"\"\"{text}\"\"\""}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.3, # Low temperature for factual analysis
+        )
         
-        raise ValueError("Failed to generate valid presentation structure after retries.")
+        content = response.choices[0].message.content
+        if not content:
+            raise ValueError("AI failed to return any concept analysis.")
+            
+        data = json.loads(content)
+        return ConceptPlan(**data)
 
-    def _get_mock_response(self, slide_count: int, topic: str) -> PresentationStructure:
-        # Use first 30 chars of text as topic if not provided
-        display_topic = (topic[:30] + '...') if len(topic) > 30 else topic
+    async def _generate_slides(self, plan: ConceptPlan, slide_count: int, stricter: bool = False) -> PresentationStructure:
+        """Step 2: Expands the concept plan into full slide content."""
+        subtopics_list = "\n".join([f"- {s}" for s in plan.subtopics])
+        prompt = FINAL_PPT_SLIDE_PROMPT.format(
+            slide_count=slide_count,
+            main_topic=plan.main_topic,
+            subtopics_list=subtopics_list
+        )
         
+        if stricter:
+            prompt += "\n!! CRITICAL RULES: DO NOT use 'Key Aspect', 'Important Detail', or any other generic headers. Each slide title MUST be specific and unique based on the subtopic."
+
+        response = await self.client.chat.completions.create(
+            model="gpt-3.5-turbo-1106",
+            messages=[
+                {"role": "system", "content": "You are a senior presentation designer. Output valid JSON only."},
+                {"role": "user", "content": prompt}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.7, # Higher temperature for better writing
+        )
+        
+        content = response.choices[0].message.content
+        if not content:
+            raise ValueError("AI failed to generate slides.")
+            
+        data = json.loads(content)
+        return PresentationStructure(**data)
+
+    def _contains_forbidden_words(self, presentation: PresentationStructure) -> bool:
+        """Checks if any generic/forbidden phrases are present in the final output."""
+        content_dump = json.dumps(presentation.model_dump()).lower()
+        for word in FORBIDDEN_WORDS:
+            if word in content_dump:
+                logger.info(f"Forbidden word matched: {word}")
+                return True
+        return False
+
+    def _get_mock_response(self, slide_count: int, text: str) -> PresentationStructure:
+        """Fallback mock generator for testing."""
+        topic = text[:40] + "..." if len(text) > 40 else text
         slides = [
             {
-                "title": f"Introduction: {display_topic}",
-                "points": ["Overview of the topic", "Key objectives", "Target audience"]
+                "title": f"Introduction to {topic}",
+                "points": ["Major industry drivers", "Core conceptual overview", "Scope of the discussion"]
             }
         ]
         
         for i in range(1, slide_count - 1):
             slides.append({
-                "title": f"Key Aspect {i}: {display_topic}",
-                "points": [f"Important detail about {display_topic}", "Supporting evidence", "Statistical data"]
+                "title": f"Implementation Strategy {i}",
+                "points": [f"Key focus on {topic} optimization", "Resource allocation models", "Performance metrics"]
             })
             
         if slide_count > 1:
             slides.append({
-                "title": "Conclusion & Summary",
-                "points": ["Final thoughts", "Call to action", "Future outlook"]
+                "title": "Conclusion & Future Path",
+                "points": ["Summary of key findings", "Recommendations for action", "Emerging trends to watch"]
             })
             
-        return PresentationStructure(topic=display_topic, slides=slides[:slide_count])
+        return PresentationStructure(topic=topic, slides=slides[:slide_count])
 
 content_engine = ContentEngine()

@@ -5,6 +5,10 @@ class Slide(BaseModel):
     title: str = Field(description="The title of the slide")
     points: List[str] = Field(description="List of bullet points for the slide", max_length=5)
 
+class ConceptPlan(BaseModel):
+    main_topic: str
+    subtopics: List[str]
+
 class PresentationStructure(BaseModel):
     topic: str = Field(description="The main topic of the presentation")
     slides: List[Slide] = Field(description="List of slides in the presentation")

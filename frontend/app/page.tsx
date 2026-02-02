@@ -219,6 +219,14 @@ export default function Home() {
               }}>
                 {charCount} / {maxChars} characters
               </div>
+              <p style={{
+                fontSize: '0.8125rem',
+                color: 'var(--color-primary)',
+                marginTop: 'var(--spacing-xs)',
+                fontStyle: 'italic'
+              }}>
+                ✨ <strong>Tip:</strong> Describe the concept clearly (e.g., "Explain Artificial Intelligence including types, applications, benefits, and challenges.")
+              </p>
             </div>
 
             {/* Slide Count */}
