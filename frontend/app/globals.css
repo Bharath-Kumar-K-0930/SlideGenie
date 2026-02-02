@@ -6,11 +6,11 @@
    MODERN CSS VARIABLES
    ============================================ */
 :root {
-  /* Colors - Requested Palette */
-  --color-primary: #e5bace;
-  --color-primary-dark: #cc9eb3;
-  --color-primary-light: #f5d4e4;
-  --color-secondary: #e1f2f7;
+  /* Colors - "We Heart UX" Palette */
+  --color-primary: #ef0d50;
+  --color-primary-dark: #cc0b44;
+  --color-primary-light: #ff4d7a;
+  --color-secondary: #eb3a70;
   --color-accent: #e5bace;
   --color-success: #10b981;
   --color-error: #ef4444;
@@ -63,10 +63,10 @@
   --color-border: #384a50;
   --color-border-light: #445b62;
 
-  --color-primary-light: #f5d4e4;
-  --color-primary: #e5bace;
-  --color-primary-dark: #cc9eb3;
-  --color-accent: #e1f2f7;
+  --color-primary-light: #ff4d7a;
+  --color-primary: #ef0d50;
+  --color-primary-dark: #cc0b44;
+  --color-accent: #eb3a70;
 }
 
 /* ============================================
@@ -280,9 +280,9 @@ p {
 }
 
 .badge-secondary {
-  background: rgba(235, 58, 112, 0.1);
-  color: var(--color-secondary);
-  border-color: rgba(235, 58, 112, 0.2);
+  background: #e5bace;
+  color: #1a2325;
+  border-color: #d4a9c0;
 }
 
 /* Feature Card */
@@ -307,17 +307,26 @@ p {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, rgba(239, 13, 80, 0.1), rgba(235, 58, 112, 0.1));
+  background: linear-gradient(135deg, var(--color-accent), #e1f2f7);
+  box-shadow: 0 4px 10px rgba(229, 186, 206, 0.3);
   margin-bottom: var(--spacing-md);
+  color: var(--color-primary);
 }
 
 /* Stat Card */
 .stat-card {
   text-align: center;
   padding: var(--spacing-lg);
-  background: var(--color-bg-secondary);
+  background: #e5bace;
   border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border-light);
+  border: 1px solid #d4a9c0;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-base);
+}
+
+.stat-card:hover {
+  transform: scale(1.05);
+  background: #ecd1df;
 }
 
 .stat-value {
@@ -331,7 +340,8 @@ p {
 
 .stat-label {
   font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  color: #4a5c61;
+  font-weight: 600;
   margin-top: var(--spacing-xs);
 }
 

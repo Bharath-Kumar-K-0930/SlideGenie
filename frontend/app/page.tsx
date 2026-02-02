@@ -109,8 +109,34 @@ export default function Home() {
       </header>
 
       {/* Hero Section */}
-      <section className="section text-center fade-in">
-        <div className="container" style={{ maxWidth: '900px' }}>
+      <section className="section text-center fade-in" style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* Decorative background shapes */}
+        <div style={{
+          position: 'absolute',
+          top: '-100px',
+          right: '-50px',
+          width: '300px',
+          height: '300px',
+          background: 'var(--color-accent)',
+          borderRadius: '50%',
+          filter: 'blur(80px)',
+          opacity: '0.15',
+          zIndex: -1
+        }} />
+        <div style={{
+          position: 'absolute',
+          bottom: '0',
+          left: '-50px',
+          width: '250px',
+          height: '250px',
+          background: '#e1f2f7',
+          borderRadius: '50%',
+          filter: 'blur(60px)',
+          opacity: '0.5',
+          zIndex: -1
+        }} />
+
+        <div className="container" style={{ maxWidth: '900px', position: 'relative' }}>
           <div className="flex items-center justify-center gap-sm mb-lg">
             <span className="badge badge-primary">AI-Powered</span>
             <span className="badge badge-secondary">Fast & Easy</span>
