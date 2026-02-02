@@ -11,6 +11,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [audience, setAudience] = useState<"general" | "technical">("general");
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
@@ -48,7 +49,7 @@ export default function Home() {
       const response = await fetch(`${apiUrl}/api/v1/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, slideCount, type }),
+        body: JSON.stringify({ text, slideCount, type, audience }),
       });
 
       if (!response.ok) {
@@ -288,6 +289,25 @@ export default function Home() {
                 <div className="flex justify-between" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 'var(--spacing-xs)' }}>
                   <span>1</span>
                   <span>15</span>
+                </div>
+              </div>
+
+              {/* Audience Selection */}
+              <div className="mb-lg">
+                <label className="label">Target Audience</label>
+                <div className="toggle-group" style={{ gridTemplateColumns: '1fr 1fr' }}>
+                  <button
+                    onClick={() => setAudience("general")}
+                    className={`toggle-option ${audience === "general" ? "active" : ""}`}
+                  >
+                    💡 General
+                  </button>
+                  <button
+                    onClick={() => setAudience("technical")}
+                    className={`toggle-option ${audience === "technical" ? "active" : ""}`}
+                  >
+                    🛠️ Technical
+                  </button>
                 </div>
               </div>
 

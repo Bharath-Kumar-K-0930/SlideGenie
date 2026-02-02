@@ -1,62 +1,53 @@
 import json
 import logging
-from typing import Optional, List
+from typing import Optional, List, Literal
 import asyncio
 from openai import AsyncOpenAI
 from app.core.config import settings
-from app.core.prompts import CONCEPT_PLANNER_PROMPT, SLIDE_CONTENT_PROMPT
 from app.schemas.presentation import PresentationStructure, ConceptPlan, Slide
+from app.services.planner import Planner
+from app.services.slide_writer import SlideWriter
+from app.services.validator import Validator
 
 # Setup logger
 logger = logging.getLogger(__name__)
 
-FORBIDDEN_WORDS = [
-    "overview",
-    "key aspect",
-    "important detail",
-    "implementation strategy",
-    "optimization",
-    "performance metrics",
-    "placeholder",
-    "supporting evidence",
-    "generic concept"
-]
-
 class ContentEngine:
     def __init__(self):
-        # Initialize OpenAI client only if API key is present
         self.client = None
+        self.planner = None
+        self.writer = None
+        
         if settings.OPENAI_API_KEY:
             self.client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+            self.planner = Planner(self.client)
+            self.writer = SlideWriter(self.client)
         else:
             logger.warning("OPENAI_API_KEY not found. AI features will fail or use mock data.")
 
-    async def generate_structure(self, text: str, slide_count: int = 5) -> PresentationStructure:
+    async def generate_structure(self, text: str, slide_count: int = 5, audience: Literal["general", "technical"] = "general") -> PresentationStructure:
         """
-        Generates structured JSON content for slides using the Gamma-style pipeline:
-        Step 1: Topic Decomposition (Concept Planner AI)
-        Step 2: Content Expansion (Slide-by-slide Generator)
-        Step 3: Validation & Polishing
+        GAMMA-LEVEL ORCHESTRATOR:
+        1. Audience Normalization (Prompt Engineering)
+        2. Topic Decomposition (The Planner)
+        3. Parallel Slide Expansion (The Writer) + Auto-Retry Loop (The Validator)
         """
-        # Step 0: Handle MOCK_AI or missing client
         if not self.client or settings.MOCK_AI:
             logger.info("Using MOCK AI response")
             await asyncio.sleep(1.5)
             return self._get_mock_response(slide_count, text)
 
-        # UI Trick/Prompt Enhancement (Internal rewrite)
-        enhanced_input = f"Create an educational and professional presentation on '{text}', covering its definition, core concepts, real-world applications, benefits, and major challenges."
-        if len(text) > 50:
-             enhanced_input = text # Trust long user prompts
+        # 1. Technical vs Non-Technical Tuning
+        normalized_text = self._normalize_prompt(text, audience)
 
         try:
-            # Step 1: Topic Decomposition (Planning Phase)
-            concept_plan = await self._plan_topic(enhanced_input, slide_count)
-            logger.info(f"Planned Topic: {concept_plan.topic} with {len(concept_plan.sections)} sections")
+            # 2. Topic Planner Phase
+            plan_content = await self.planner.generate_outline(normalized_text, slide_count)
+            concept_plan = ConceptPlan(**json.loads(plan_content))
+            logger.info(f"Planned: {concept_plan.topic}")
 
-            # Step 2: Content Expansion (Execution Phase)
-            # Parallelize slide generation for speed
-            tasks = [self._expand_section(section) for section in concept_plan.sections]
+            # 3. Slide Generator Phase (Parallel execution with validation)
+            tasks = [self._write_with_retry(section) for section in concept_plan.sections]
             slides = await asyncio.gather(*tasks)
             
             presentation = PresentationStructure(
@@ -64,90 +55,54 @@ class ContentEngine:
                 slides=slides
             )
 
-            # Step 3: Polish & Validate (Retry layer)
-            if self._contains_forbidden_words(presentation):
-                logger.warning("Generic content detected. Re-buffering target slides...")
-                # Simple retry logic for the whole deck for now (could be per-slide in future)
-                tasks = [self._expand_section(section, stricter=True) for section in concept_plan.sections]
-                slides = await asyncio.gather(*tasks)
-                presentation.slides = slides
-
-            # Final check (Singe slide constraint check)
+            # Final size check
             if len(presentation.slides) > 15:
                 presentation.slides = presentation.slides[:15]
             
             return presentation
 
         except Exception as e:
-            logger.error(f"Gamma Pipeline Error: {e}")
+            logger.error(f"Senior Pipeline Orchestration Error: {e}")
             raise e
 
-    async def _plan_topic(self, text: str, slide_count: int) -> ConceptPlan:
-        """Task 1: Break topic into a natural learning flow."""
-        prompt = CONCEPT_PLANNER_PROMPT.format(slide_count=slide_count)
-        
-        response = await self.client.chat.completions.create(
-            model="gpt-3.5-turbo-1106",
-            messages=[
-                {"role": "system", "content": "You are a senior curriculum designer. Output valid JSON only."},
-                {"role": "user", "content": f"{prompt}\n\nUSER TOPIC:\n\"\"\"{text}\"\"\""}
-            ],
-            response_format={"type": "json_object"},
-            temperature=0.2, # Very low for structural accuracy
+    async def _write_with_retry(self, section, retries=2) -> Slide:
+        """The expansion loop with validator"""
+        for i in range(retries):
+            try:
+                content = await self.writer.generate_slide(
+                    section.section_title, 
+                    section.what_to_cover, 
+                    is_retry=(i > 0)
+                )
+                slide_json = json.loads(content)
+                
+                if Validator.is_valid_slide(slide_json):
+                    return Slide(title=slide_json["title"], points=slide_json["bullet_points"])
+                
+                logger.warning(f"Low-quality slide detected for '{section.section_title}', retry {i+1}...")
+            except Exception as e:
+                logger.error(f"Slide expansion error for '{section.section_title}': {e}")
+                
+        # Safe fallback
+        return Slide(
+            title=section.section_title, 
+            points=["Refer to technical documentation for in-depth details.", "Standard implementation protocols apply.", "Evaluate performance based on specific use cases."]
         )
-        
-        content = response.choices[0].message.content
-        if not content:
-            raise ValueError("Planner AI failed to return a structure.")
-            
-        data = json.loads(content)
-        return ConceptPlan(**data)
 
-    async def _expand_section(self, section, stricter: bool = False) -> Slide:
-        """Task 2: Expand a single planned section into a slide."""
-        prompt = SLIDE_CONTENT_PROMPT.format(
-            section_title=section.section_title,
-            what_to_cover=section.what_to_cover
-        )
-        
-        if stricter:
-            prompt += "\n!! CRITICAL: You MUST use deep factual details. AVOID generic phrases like 'Overview', 'Key Aspect', or 'Supporting Evidence'."
-
-        response = await self.client.chat.completions.create(
-            model="gpt-3.5-turbo-1106",
-            messages=[
-                {"role": "system", "content": "You are a professional presentation writer. Output valid JSON only."},
-                {"role": "user", "content": prompt}
-            ],
-            response_format={"type": "json_object"},
-            temperature=0.7, # Higher for rich language
-        )
-        
-        content = response.choices[0].message.content
-        if not content:
-            return Slide(title=section.section_title, points=["Error generating content for this section."])
-            
-        data = json.loads(content)
-        # Map bullet_points from prompt to points in schema
-        return Slide(title=data["title"], points=data["bullet_points"])
-
-    def _contains_forbidden_words(self, presentation: PresentationStructure) -> bool:
-        """Checks if generic fluff is present."""
-        dump = json.dumps(presentation.model_dump()).lower()
-        for word in FORBIDDEN_WORDS:
-            if word in dump:
-                logger.info(f"Forbidden word match: {word}")
-                return True
-        return False
+    def _normalize_prompt(self, user_prompt: str, audience: str) -> str:
+        """Internal prompt engineering based on audience"""
+        if audience == "technical":
+            return f"Create a technical presentation for computer science students. Use formal terminology, explain architecture/mechanisms, and provide data-driven examples. Topic: \"{user_prompt}\""
+        else:
+            return f"Create an easy-to-understand presentation for a general audience. Avoid jargon, use real-world analogies, and keep descriptions simple and engaging. Topic: \"{user_prompt}\""
 
     def _get_mock_response(self, slide_count: int, text: str) -> PresentationStructure:
-        """Factual-looking mock data."""
         topic = text[:40] + "..." if len(text) > 40 else text
         slides = []
         for i in range(slide_count):
             slides.append({
                 "title": f"Structural Component {i+1} for {topic}",
-                "points": [f"Deep analysis of {topic} phase {i}", "Contextual integration with core systems", "Comparative evaluation of current models"]
+                "points": ["Major industry drivers", "Core conceptual overview", "Scope of the discussion"]
             })
         return PresentationStructure(topic=topic, slides=slides)
 

@@ -3,8 +3,8 @@ from pydantic import BaseModel, Field
 from typing import Literal
 import base64
 from app.services.content_engine import content_engine
-from app.services.ppt_generator import ppt_generator
-from app.services.pdf_generator import pdf_generator
+from app.services.ppt_builder import ppt_generator as ppt_builder
+from app.services.pdf_builder import pdf_generator as pdf_builder
 from app.core.limiter import limiter
 
 router = APIRouter()
@@ -14,6 +14,7 @@ class GenerateRequest(BaseModel):
     text: str
     slideCount: int = Field(default=5, ge=1, le=15)  # Between 1 and 15
     type: Literal["pptx", "pdf"] = "pptx"
+    audience: Literal["general", "technical"] = "general"
 
 @router.post("/generate", tags=["generation"])
 @limiter.limit("5/minute")
@@ -33,7 +34,7 @@ async def generate_presentation(request: Request, payload: GenerateRequest):
         
     try:
         # Step 1: AI Structure Generation
-        structure = await content_engine.generate_structure(payload.text, payload.slideCount)
+        structure = await content_engine.generate_structure(payload.text, payload.slideCount, payload.audience)
         
         # Step 2: Generate File
         # Offload CPU-bound work to threadpool to avoid blocking async event loop
@@ -46,12 +47,12 @@ async def generate_presentation(request: Request, payload: GenerateRequest):
         if payload.type == "pdf":
             filename = "presentation.pdf"
             content_type = "application/pdf"
-            file_buffer = await asyncio.to_thread(pdf_generator.generate, structure)
+            file_buffer = await asyncio.to_thread(pdf_builder.generate, structure)
         else:
             # Default to PPTX
             filename = "presentation.pptx"
             content_type = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-            file_buffer = await asyncio.to_thread(ppt_generator.generate, structure)
+            file_buffer = await asyncio.to_thread(ppt_builder.generate, structure)
         
         # Step 3: Encode to Base64
         file_base64 = base64.b64encode(file_buffer.getvalue()).decode('utf-8')
