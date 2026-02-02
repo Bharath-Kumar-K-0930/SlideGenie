@@ -6,10 +6,10 @@
    MODERN CSS VARIABLES
    ============================================ */
 :root {
-  /* Colors */
+  /* Colors - "We Heart UX" Palette */
   --color-primary: #ef0d50;
-  --color-primary-dark: #c70b43;
-  --color-primary-light: #f6678b;
+  --color-primary-dark: #cc0b44;
+  --color-primary-light: #ff4d7a;
   --color-secondary: #eb3a70;
   --color-accent: #e5bace;
   --color-success: #10b981;
@@ -19,12 +19,12 @@
   /* Neutrals */
   --color-bg: #e1f2f7;
   --color-bg-secondary: #f0f8fa;
-  --color-bg-tertiary: #e6f4f7;
-  --color-text: #1a2b30;
-  --color-text-secondary: #4a6670;
-  --color-text-muted: #6b8a95;
-  --color-border: #c8e1e7;
-  --color-border-light: #d6ebf0;
+  --color-bg-tertiary: #d6ebf0;
+  --color-text: #1a2325;
+  --color-text-secondary: #4a5c61;
+  --color-text-muted: #7a8e94;
+  --color-border: #cbdce0;
+  --color-border-light: #dceef2;
 
   /* Shadows */
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -54,18 +54,19 @@
 }
 
 [data-theme="dark"] {
-  --color-bg: #1a2b30;
-  --color-bg-secondary: #243c43;
-  --color-bg-tertiary: #2d4a53;
+  --color-bg: #1a2325;
+  --color-bg-secondary: #242f33;
+  --color-bg-tertiary: #2d3b40;
   --color-text: #e1f2f7;
-  --color-text-secondary: #8da9b3;
-  --color-text-muted: #6b8a95;
-  --color-border: #2d4a53;
-  --color-border-light: #385b66;
+  --color-text-secondary: #a3b8bc;
+  --color-text-muted: #7a8e94;
+  --color-border: #384a50;
+  --color-border-light: #445b62;
 
-  --color-primary-light: #ef0d50;
-  --color-primary: #f6678b;
-  --color-primary-dark: #ff8eaa;
+  --color-primary-light: #ff4d7a;
+  --color-primary: #ef0d50;
+  --color-primary-dark: #cc0b44;
+  --color-accent: #eb3a70;
 }
 
 /* ============================================
@@ -234,7 +235,7 @@ p {
 .input:focus,
 .textarea:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 0 3px rgba(239, 13, 80, 0.1);
 }
 
 .textarea {
@@ -273,15 +274,15 @@ p {
 }
 
 .badge-primary {
-  background: rgba(59, 130, 246, 0.1);
+  background: rgba(239, 13, 80, 0.1);
   color: var(--color-primary);
-  border-color: rgba(59, 130, 246, 0.2);
+  border-color: rgba(239, 13, 80, 0.2);
 }
 
 .badge-secondary {
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(235, 58, 112, 0.1);
   color: var(--color-secondary);
-  border-color: rgba(139, 92, 246, 0.2);
+  border-color: rgba(235, 58, 112, 0.2);
 }
 
 /* Feature Card */
@@ -306,7 +307,7 @@ p {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-lg);
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+  background: linear-gradient(135deg, rgba(239, 13, 80, 0.1), rgba(235, 58, 112, 0.1));
   margin-bottom: var(--spacing-md);
 }
 
@@ -384,13 +385,13 @@ p {
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 2px 8px rgba(239, 13, 80, 0.4);
   transition: all var(--transition-base);
 }
 
 .slider::-webkit-slider-thumb:hover {
   transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.5);
+  box-shadow: 0 4px 12px rgba(239, 13, 80, 0.5);
 }
 
 .slider::-moz-range-thumb {
@@ -557,10 +558,11 @@ p {
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+  color: transparent;
 }
 
 /* Spacing Utilities */
