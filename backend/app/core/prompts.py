@@ -1,61 +1,53 @@
-CONCEPT_EXTRACTION_PROMPT = """You are an expert subject-matter analyst.
+CONCEPT_PLANNER_PROMPT = """You are a subject-matter expert and curriculum designer.
 
 TASK:
-Analyze the user's input and identify the EXACT core topic and its key sub-concepts for a {slide_count}-slide presentation.
+Break the given topic into a clear, logical presentation outline suitable for a {slide_count}-slide PowerPoint presentation.
 
 RULES:
-1. Do NOT generate slides.
-2. Do NOT add generic placeholders.
-3. Extract only what is logically present or implied in the input.
-4. Be specific. Avoid vague terms like "Key Aspect".
-5. Output EXACTLY {slide_count} specific subtopics that cover the main topic comprehensively.
+1. Do NOT generate slide content.
+2. Do NOT use generic terms like "Key Aspect", "Overview", or "Implementation Strategy".
+3. Each section must be specific and directly related to the topic.
+4. The outline must follow a natural learning flow.
+5. Provide EXACTLY {slide_count} sections.
 
 OUTPUT FORMAT (STRICT JSON):
 {{
-  "main_topic": "string",
-  "subtopics": [
-    "specific subtopic 1",
-    "specific subtopic 2",
-    "specific subtopic 3"
+  "topic": "string",
+  "sections": [
+    {{
+      "section_title": "string",
+      "what_to_cover": "1–2 sentence description of specific facts and details to include"
+    }}
   ]
 }}
 """
 
-FINAL_PPT_SLIDE_PROMPT = """You are a senior presentation designer.
+SLIDE_CONTENT_PROMPT = """You are a professional presentation writer.
 
 TASK:
-Create a PowerPoint presentation using the provided topic and subtopics.
+Create PowerPoint slide content for the following section.
 
-STRICT RULES:
+RULES:
 1. Output ONLY valid JSON.
-2. NO generic titles like "Key Aspect", "Overview", or "Important Detail".
-3. Slide titles MUST directly reflect the subtopic from the input data.
-4. Content MUST stay within the given topic.
-5. Do NOT invent unrelated concepts.
-6. Each bullet point must be factual and specific.
-7. Avoid markdown formatting like ```json ... ```.
+2. Slide title must match the section title exactly.
+3. Bullet points must be factual, specific, and non-generic.
+4. Each bullet point: max 12 words.
+5. No filler text. No vague phrases like "Important detail" or "Learn more".
+6. Avoid markdown formatting like ```json ... ```.
 
-SLIDE STRUCTURE:
-- EXACTLY {slide_count} slides
-- Each slide:
-  {{
-    "title": "clear and specific",
-    "points": ["concise point 1", "concise point 2"]
-  }}
-- Bullet points must be concise (max 12 words per point).
+SECTION TITLE:
+{section_title}
 
-INPUT DATA:
-Main Topic: {main_topic}
-Subtopics: {subtopics_list}
+WHAT TO COVER:
+{what_to_cover}
 
-JSON OUTPUT FORMAT:
+OUTPUT FORMAT (STRICT JSON):
 {{
-  "topic": "{main_topic}",
-  "slides": [
-    {{
-      "title": "string",
-      "points": ["string"]
-    }}
+  "title": "{section_title}",
+  "bullet_points": [
+    "string",
+    "string",
+    "string"
   ]
 }}
 """
