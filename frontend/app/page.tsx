@@ -195,121 +195,165 @@ export default function Home() {
 
       {/* Generator Section */}
       <section id="generator" className="section" style={{ background: 'var(--color-bg-secondary)' }}>
-        <div className="container" style={{ maxWidth: '800px' }}>
-          <div className="card">
-            <h3 className="mb-lg text-center">Create Your Presentation</h3>
-
-            {/* Content Input */}
-            <div className="mb-lg">
-              <label className="label">
-                Your Content
-              </label>
-              <textarea
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                placeholder="Example: 'The future of renewable energy, including solar power advancements, wind energy innovations, and sustainable practices for 2026.'"
-                className="textarea"
-                maxLength={maxChars}
-              />
-              <div style={{
-                fontSize: '0.75rem',
-                color: 'var(--color-text-muted)',
-                textAlign: 'right',
-                marginTop: 'var(--spacing-xs)'
-              }}>
-                {charCount} / {maxChars} characters
+        <div className="container" style={{ maxWidth: '1100px' }}>
+          <div className="grid grid-2 items-start gap-2xl">
+            {/* Guide Section */}
+            <div className="fade-in" style={{ padding: 'var(--spacing-md)' }}>
+              <div className="mb-lg">
+                <h3 className="mb-md" style={{ color: 'var(--color-primary)' }}>
+                  How to write the content prompt
+                </h3>
+                <p className="mb-md" style={{ color: 'var(--color-text-secondary)', fontSize: '0.9375rem' }}>
+                  Get the best results by following these simple prompt structures. Our AI works best when given clear boundaries and specific topics.
+                </p>
               </div>
-              <p style={{
-                fontSize: '0.8125rem',
-                color: 'var(--color-primary)',
-                marginTop: 'var(--spacing-xs)',
-                fontStyle: 'italic'
-              }}>
-                ✨ <strong>Tip:</strong> Describe the concept clearly (e.g., "Explain Artificial Intelligence including types, applications, benefits, and challenges.")
-              </p>
-            </div>
 
-            {/* Slide Count */}
-            <div className="mb-lg">
-              <label className="label">
-                Number of Slides: <span className="text-gradient" style={{ fontSize: '1.125rem' }}>{slideCount}</span>
-              </label>
-              <input
-                type="range"
-                min="1"
-                max="15"
-                value={slideCount}
-                onChange={(e) => setSlideCount(Number(e.target.value))}
-                className="slider"
-              />
-              <div className="flex justify-between" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 'var(--spacing-xs)' }}>
-                <span>1</span>
-                <span>15</span>
+              <div className="flex flex-col gap-md">
+                <div className="card" style={{ padding: 'var(--spacing-md)', background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+                  <h4 className="mb-xs" style={{ fontSize: '0.875rem', fontWeight: 700 }}>1. The "Standard" Approach</h4>
+                  <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+                    "Explain [Topic] including [Aspect 1], [Aspect 2], and [Aspect 3]."
+                  </p>
+                </div>
+
+                <div className="card" style={{ padding: 'var(--spacing-md)', background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+                  <h4 className="mb-xs" style={{ fontSize: '0.875rem', fontWeight: 700 }}>2. The "Deep Dive" Approach</h4>
+                  <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+                    "Provide a technical overview of [Technology], covering its architecture, use cases, and future trends."
+                  </p>
+                </div>
+
+                <div className="card" style={{ padding: 'var(--spacing-md)', background: 'var(--color-bg)', border: '1px solid var(--color-border)', borderRadius: 'var(--radius-md)' }}>
+                  <h4 className="mb-xs" style={{ fontSize: '0.875rem', fontWeight: 700 }}>3. The "Business" Approach</h4>
+                  <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>
+                    "A business pitch for [Product Name], highlighting the problem it solves, market size, and ROI."
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-lg" style={{ marginTop: 'var(--spacing-xl)', padding: 'var(--spacing-md)', borderRadius: 'var(--radius-md)', background: 'rgba(239, 13, 80, 0.05)', borderLeft: '4px solid var(--color-primary)' }}>
+                <p style={{ fontSize: '0.875rem', color: 'var(--color-text)', fontWeight: 500 }}>
+                  💡 Pro Tip: Describe your concept clearly in 10-50 words for the most factual and professional slides.
+                </p>
               </div>
             </div>
 
-            {/* Format Selection */}
-            <div className="mb-xl">
-              <label className="label">Output Format</label>
-              <div className="toggle-group">
-                <button
-                  onClick={() => setType("pptx")}
-                  className={`toggle-option ${type === "pptx" ? "active" : ""}`}
-                >
-                  <div className="flex items-center justify-center gap-sm">
-                    <span>📊</span>
-                    <span>PowerPoint</span>
-                  </div>
-                </button>
-                <button
-                  onClick={() => setType("pdf")}
-                  className={`toggle-option ${type === "pdf" ? "active" : ""}`}
-                >
-                  <div className="flex items-center justify-center gap-sm">
-                    <span>📄</span>
-                    <span>PDF</span>
-                  </div>
-                </button>
-              </div>
-            </div>
+            {/* Generator Card */}
+            <div className="card">
+              <h3 className="mb-lg text-center">Create Your Presentation</h3>
 
-            {/* Generate Button */}
-            <button
-              onClick={handleGenerate}
-              disabled={loading || !text.trim()}
-              className="btn btn-primary btn-lg"
-              style={{ width: '100%' }}
-            >
-              {loading ? (
-                <>
-                  <svg className="spin" width="20" height="20" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  <span>Generating...</span>
-                </>
-              ) : (
-                <>
-                  <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  <span>Generate Presentation</span>
-                </>
+              {/* Content Input */}
+              <div className="mb-lg">
+                <label className="label">
+                  Your Content
+                </label>
+                <textarea
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                  placeholder="Example: 'The future of renewable energy, including solar power advancements, wind energy innovations, and sustainable practices for 2026.'"
+                  className="textarea"
+                  maxLength={maxChars}
+                />
+                <div style={{
+                  fontSize: '0.75rem',
+                  color: 'var(--color-text-muted)',
+                  textAlign: 'right',
+                  marginTop: 'var(--spacing-xs)'
+                }}>
+                  {charCount} / {maxChars} characters
+                </div>
+                <p style={{
+                  fontSize: '0.8125rem',
+                  color: 'var(--color-primary)',
+                  marginTop: 'var(--spacing-xs)',
+                  fontStyle: 'italic'
+                }}>
+                  ✨ <strong>Tip:</strong> Describe the concept clearly (e.g., "Explain Artificial Intelligence including types, applications, benefits, and challenges.")
+                </p>
+              </div>
+
+              {/* Slide Count */}
+              <div className="mb-lg">
+                <label className="label">
+                  Number of Slides: <span className="text-gradient" style={{ fontSize: '1.125rem' }}>{slideCount}</span>
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="15"
+                  value={slideCount}
+                  onChange={(e) => setSlideCount(Number(e.target.value))}
+                  className="slider"
+                />
+                <div className="flex justify-between" style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: 'var(--spacing-xs)' }}>
+                  <span>1</span>
+                  <span>15</span>
+                </div>
+              </div>
+
+              {/* Format Selection */}
+              <div className="mb-xl">
+                <label className="label">Output Format</label>
+                <div className="toggle-group">
+                  <button
+                    onClick={() => setType("pptx")}
+                    className={`toggle-option ${type === "pptx" ? "active" : ""}`}
+                  >
+                    <div className="flex items-center justify-center gap-sm">
+                      <span>📊</span>
+                      <span>PowerPoint</span>
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => setType("pdf")}
+                    className={`toggle-option ${type === "pdf" ? "active" : ""}`}
+                  >
+                    <div className="flex items-center justify-center gap-sm">
+                      <span>📄</span>
+                      <span>PDF</span>
+                    </div>
+                  </button>
+                </div>
+              </div>
+
+              {/* Generate Button */}
+              <button
+                onClick={handleGenerate}
+                disabled={loading || !text.trim()}
+                className="btn btn-primary btn-lg"
+                style={{ width: '100%' }}
+              >
+                {loading ? (
+                  <>
+                    <svg className="spin" width="20" height="20" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span>Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span>Generate Presentation</span>
+                  </>
+                )}
+              </button>
+
+              {/* Alerts */}
+              {error && (
+                <div className="alert alert-error" style={{ marginTop: 'var(--spacing-lg)' }}>
+                  {error}
+                </div>
               )}
-            </button>
 
-            {/* Alerts */}
-            {error && (
-              <div className="alert alert-error" style={{ marginTop: 'var(--spacing-lg)' }}>
-                {error}
-              </div>
-            )}
-
-            {success && (
-              <div className="alert alert-success" style={{ marginTop: 'var(--spacing-lg)' }}>
-                ✓ Success! Your file has been downloaded.
-              </div>
-            )}
+              {success && (
+                <div className="alert alert-success" style={{ marginTop: 'var(--spacing-lg)' }}>
+                  ✓ Success! Your file has been downloaded.
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
