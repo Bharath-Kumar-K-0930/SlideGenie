@@ -24,11 +24,11 @@ class ContentEngine:
         Generates structured JSON content for slides using AI.
         Includes retry logic for malformed JSON and schema validation.
         """
-        if not self.client:
-             # Fallback or Mock for testing without API Key
-            logger.info("Using MOCK AI response (No API Key)")
-            await asyncio.sleep(1) # Simulate delay
-            return self._get_mock_response(slide_count)
+        if not self.client or settings.MOCK_AI:
+            # Fallback or Mock for testing without API Key or if forced
+            logger.info("Using MOCK AI response")
+            await asyncio.sleep(1.5) # Simulate AI thinking delay
+            return self._get_mock_response(slide_count, text)
 
         prompt = f"{SYSTEM_PROMPT.format(slide_count=slide_count)}\n\n{text}"
         
@@ -71,13 +71,29 @@ class ContentEngine:
         
         raise ValueError("Failed to generate valid presentation structure after retries.")
 
-    def _get_mock_response(self, slide_count: int) -> PresentationStructure:
-        slides = []
-        for i in range(slide_count):
+    def _get_mock_response(self, slide_count: int, topic: str) -> PresentationStructure:
+        # Use first 30 chars of text as topic if not provided
+        display_topic = (topic[:30] + '...') if len(topic) > 30 else topic
+        
+        slides = [
+            {
+                "title": f"Introduction: {display_topic}",
+                "points": ["Overview of the topic", "Key objectives", "Target audience"]
+            }
+        ]
+        
+        for i in range(1, slide_count - 1):
             slides.append({
-                "title": f"Mock Slide {i+1}",
-                "points": ["Point 1", "Point 2", "Point 3"]
+                "title": f"Key Aspect {i}: {display_topic}",
+                "points": [f"Important detail about {display_topic}", "Supporting evidence", "Statistical data"]
             })
-        return PresentationStructure(topic="Mock Presentation", slides=slides)
+            
+        if slide_count > 1:
+            slides.append({
+                "title": "Conclusion & Summary",
+                "points": ["Final thoughts", "Call to action", "Future outlook"]
+            })
+            
+        return PresentationStructure(topic=display_topic, slides=slides[:slide_count])
 
 content_engine = ContentEngine()

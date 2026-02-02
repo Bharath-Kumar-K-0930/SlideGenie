@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     
     # AI Config
     OPENAI_API_KEY: str | None = None
+    MOCK_AI: bool = False
 
     class Config:
         case_sensitive = True

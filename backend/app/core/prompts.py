@@ -3,12 +3,12 @@ SYSTEM_PROMPT = """You are an expert content strategist and presentation designe
 RULES:
 1. Output MUST be valid JSON only. Do not include markdown formatting like ```json ... ``` or any intro/outro text.
 2. The structure must strictly follow the schema:
-   {
+   {{
      "topic": "string",
      "slides": [
-       { "title": "string", "points": ["string", "string"] }
+       {{ "title": "string", "points": ["string", "string"] }}
      ]
-   }
+   }}
 3. Create exactly {slide_count} slides.
 4. Each slide MUST have a title and a list of bullet points.
 5. Max 5 bullet points per slide.

@@ -72,7 +72,23 @@ async def generate_presentation(request: Request, payload: GenerateRequest):
     except Exception as e:
         import traceback
         traceback.print_exc()
+        
+        # Determine status code and message
+        status_code = 500
+        error_msg = str(e)
+        
+        # Better error messages for OpenAI
+        if "insufficient_quota" in error_msg:
+            status_code = 402 # Payment Required or just 429
+            error_msg = "OpenAI API Quota exceeded. Please check your billing/usage."
+        elif "rate_limit" in error_msg.lower():
+            status_code = 429
+            error_msg = "OpenAI Rate limit reached. Try again in a moment."
+        elif "api_key" in error_msg.lower():
+            status_code = 401
+            error_msg = "Invalid or missing OpenAI API Key."
+            
         log_error(e, "generate_presentation")
         duration_ms = (time.time() - start_time) * 1000
         log_request("/generate", "error", duration_ms)
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=status_code, detail=error_msg)
