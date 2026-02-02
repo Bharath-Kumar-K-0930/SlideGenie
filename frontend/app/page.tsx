@@ -379,7 +379,7 @@ export default function Home() {
               </a>
 
               <a
-                href="mailto:bharathkumatkbk10@gmail.com"
+                href="mailto:bharathkumarkbk10@gmail.com"
                 className="social-icon-btn email"
                 title="Email"
               >

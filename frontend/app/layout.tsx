@@ -28,7 +28,13 @@ export const metadata: Metadata = {
   title: "SlideGenie AI - AI-Powered Presentation Generator",
   description: "Turn your text into professional presentations or documents in seconds with AI",
   icons: {
-    icon: '/logo.png',
+    icon: [
+      { url: '/logo.png' },
+      { url: '/logo.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/logo.png' },
+    ],
   },
 };
 
