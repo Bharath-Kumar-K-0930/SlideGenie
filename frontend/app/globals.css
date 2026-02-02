@@ -6,11 +6,11 @@
    MODERN CSS VARIABLES
    ============================================ */
 :root {
-  /* Colors - "We Heart UX" Palette */
-  --color-primary: #ef0d50;
-  --color-primary-dark: #cc0b44;
-  --color-primary-light: #ff4d7a;
-  --color-secondary: #eb3a70;
+  /* Colors - Requested Palette */
+  --color-primary: #e5bace;
+  --color-primary-dark: #cc9eb3;
+  --color-primary-light: #f5d4e4;
+  --color-secondary: #e1f2f7;
   --color-accent: #e5bace;
   --color-success: #10b981;
   --color-error: #ef4444;
@@ -63,10 +63,10 @@
   --color-border: #384a50;
   --color-border-light: #445b62;
 
-  --color-primary-light: #ff4d7a;
-  --color-primary: #ef0d50;
-  --color-primary-dark: #cc0b44;
-  --color-accent: #eb3a70;
+  --color-primary-light: #f5d4e4;
+  --color-primary: #e5bace;
+  --color-primary-dark: #cc9eb3;
+  --color-accent: #e1f2f7;
 }
 
 /* ============================================
