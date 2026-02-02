@@ -12,6 +12,8 @@ export default function Home() {
   const [success, setSuccess] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [audience, setAudience] = useState<"general" | "technical">("general");
+  const [domain, setDomain] = useState<"general" | "technical" | "mathematics" | "law" | "medicine">("general");
+  const [improvingPrompt, setImprovingPrompt] = useState(false);
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
@@ -33,6 +35,29 @@ export default function Home() {
     }
   };
 
+  const handleImprovePrompt = async () => {
+    if (!text.trim()) return;
+
+    setImprovingPrompt(true);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const response = await fetch(`${apiUrl}/api/v1/improve-prompt`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setText(data.data.improved_text);
+      }
+    } catch (err) {
+      console.error("Failed to improve prompt", err);
+    } finally {
+      setImprovingPrompt(false);
+    }
+  };
+
   const handleGenerate = async () => {
     if (!text.trim()) {
       setError("Please enter some content");
@@ -49,7 +74,7 @@ export default function Home() {
       const response = await fetch(`${apiUrl}/api/v1/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, slideCount, type, audience }),
+        body: JSON.stringify({ text, slideCount, type, audience, domain }),
       });
 
       if (!response.ok) {
@@ -245,9 +270,19 @@ export default function Home() {
 
               {/* Content Input */}
               <div className="mb-lg">
-                <label className="label">
-                  Your Content
-                </label>
+                <div className="flex items-center justify-between mb-sm">
+                  <label className="label" style={{ marginBottom: 0 }}>
+                    Your Content
+                  </label>
+                  <button
+                    onClick={handleImprovePrompt}
+                    disabled={improvingPrompt || !text.trim()}
+                    className="btn btn-secondary btn-sm"
+                    style={{ fontSize: '0.75rem', padding: '0.25rem 0.75rem' }}
+                  >
+                    {improvingPrompt ? '⌛ Improving...' : '✨ Improve Prompt'}
+                  </button>
+                </div>
                 <textarea
                   value={text}
                   onChange={(e) => setText(e.target.value)}
@@ -271,6 +306,18 @@ export default function Home() {
                 }}>
                   ✨ <strong>Tip:</strong> Describe the concept clearly (e.g., "Explain Artificial Intelligence including types, applications, benefits, and challenges.")
                 </p>
+              </div>
+
+              {/* Topic Domain */}
+              <div className="mb-lg">
+                <label className="label">Topic Domain</label>
+                <div className="toggle-group" style={{ gridTemplateColumns: 'repeat(3, 1fr)', fontSize: '0.8125rem' }}>
+                  <button onClick={() => setDomain("general")} className={`toggle-option ${domain === "general" ? "active" : ""}`}>🌐 General</button>
+                  <button onClick={() => setDomain("technical")} className={`toggle-option ${domain === "technical" ? "active" : ""}`}>💻 Tech</button>
+                  <button onClick={() => setDomain("mathematics")} className={`toggle-option ${domain === "mathematics" ? "active" : ""}`}>🔢 Math</button>
+                  <button onClick={() => setDomain("law")} className={`toggle-option ${domain === "law" ? "active" : ""}`}>⚖️ Law</button>
+                  <button onClick={() => setDomain("medicine")} className={`toggle-option ${domain === "medicine" ? "active" : ""}`}>🩺 Med</button>
+                </div>
               </div>
 
               {/* Slide Count */}

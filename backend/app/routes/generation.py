@@ -15,6 +15,18 @@ class GenerateRequest(BaseModel):
     slideCount: int = Field(default=5, ge=1, le=15)  # Between 1 and 15
     type: Literal["pptx", "pdf"] = "pptx"
     audience: Literal["general", "technical"] = "general"
+    domain: Literal["general", "technical", "mathematics", "law", "medicine"] = "general"
+
+class ImprovePromptRequest(BaseModel):
+    text: str
+
+@router.post("/improve-prompt", tags=["generation"])
+async def improve_prompt_endpoint(payload: ImprovePromptRequest):
+    """
+    Rewrites a weak prompt into a structured one.
+    """
+    improved_text = await content_engine.improve_user_prompt(payload.text)
+    return {"status": "success", "data": {"improved_text": improved_text}}
 
 @router.post("/generate", tags=["generation"])
 @limiter.limit("5/minute")
@@ -34,7 +46,12 @@ async def generate_presentation(request: Request, payload: GenerateRequest):
         
     try:
         # Step 1: AI Structure Generation
-        structure = await content_engine.generate_structure(payload.text, payload.slideCount, payload.audience)
+        structure = await content_engine.generate_structure(
+            payload.text, 
+            payload.slideCount, 
+            payload.audience,
+            payload.domain
+        )
         
         # Step 2: Generate File
         # Offload CPU-bound work to threadpool to avoid blocking async event loop

@@ -4,13 +4,20 @@ from typing import Optional, List, Literal
 import asyncio
 from openai import AsyncOpenAI
 from app.core.config import settings
+from app.core.prompts import (
+    CONCEPT_PLANNER_PROMPT, 
+    SLIDE_CONTENT_PROMPT, 
+    DOMAIN_RULES, 
+    PROMPT_IMPROVER_PROMPT
+)
 from app.schemas.presentation import PresentationStructure, ConceptPlan, Slide
-from app.services.planner import Planner
-from app.services.slide_writer import SlideWriter
-from app.services.validator import Validator
 
 # Setup logger
 logger = logging.getLogger(__name__)
+
+from app.services.planner import Planner
+from app.services.slide_writer import SlideWriter
+from app.services.validator import Validator
 
 class ContentEngine:
     def __init__(self):
@@ -25,29 +32,49 @@ class ContentEngine:
         else:
             logger.warning("OPENAI_API_KEY not found. AI features will fail or use mock data.")
 
-    async def generate_structure(self, text: str, slide_count: int = 5, audience: Literal["general", "technical"] = "general") -> PresentationStructure:
+    async def improve_user_prompt(self, user_input: str) -> str:
+        """UX Power Feature: Rewrites weak prompts into structured requests."""
+        if not self.client:
+            return user_input
+            
+        try:
+            prompt = PROMPT_IMPROVER_PROMPT.format(user_input=user_input)
+            response = await self.client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as e:
+            logger.error(f"Prompt improvement error: {e}")
+            return user_input
+
+    async def generate_structure(self, text: str, slide_count: int = 5, audience: str = "general", domain: str = "general") -> PresentationStructure:
         """
-        GAMMA-LEVEL ORCHESTRATOR:
-        1. Audience Normalization (Prompt Engineering)
-        2. Topic Decomposition (The Planner)
-        3. Parallel Slide Expansion (The Writer) + Auto-Retry Loop (The Validator)
+        PRODUCTION-GRADE PIPELINE:
+        1. Domain-Aware Expansion
+        2. Stage 1 Planner (Topic Decomposition)
+        3. Stage 2 Parallel Expansion + Stage 3 Confidence Scoring & Retry
         """
         if not self.client or settings.MOCK_AI:
             logger.info("Using MOCK AI response")
             await asyncio.sleep(1.5)
             return self._get_mock_response(slide_count, text)
 
-        # 1. Technical vs Non-Technical Tuning
-        normalized_text = self._normalize_prompt(text, audience)
+        # 1. Domain Detection / Audience Normalization
+        # Combining audience and domain for rules
+        domain_rules = DOMAIN_RULES.get(domain, DOMAIN_RULES["general"])
+        if audience == "technical" and domain == "general":
+            domain_rules = DOMAIN_RULES["technical"]
 
         try:
             # 2. Topic Planner Phase
-            plan_content = await self.planner.generate_outline(normalized_text, slide_count)
+            plan_content = await self.planner.generate_outline(text, slide_count)
             concept_plan = ConceptPlan(**json.loads(plan_content))
-            logger.info(f"Planned: {concept_plan.topic}")
+            logger.info(f"Planned Domain: {domain} | Topic: {concept_plan.topic}")
 
-            # 3. Slide Generator Phase (Parallel execution with validation)
-            tasks = [self._write_with_retry(section) for section in concept_plan.sections]
+            # 3. Slide Generator Phase (Parallel execution with AI Scoring)
+            tasks = [self._write_with_ai_scoring(section, domain_rules) for section in concept_plan.sections]
             slides = await asyncio.gather(*tasks)
             
             presentation = PresentationStructure(
@@ -55,46 +82,47 @@ class ContentEngine:
                 slides=slides
             )
 
-            # Final size check
-            if len(presentation.slides) > 15:
-                presentation.slides = presentation.slides[:15]
-            
             return presentation
 
         except Exception as e:
-            logger.error(f"Senior Pipeline Orchestration Error: {e}")
+            logger.error(f"Advanced Pipeline Error: {e}")
             raise e
 
-    async def _write_with_retry(self, section, retries=2) -> Slide:
-        """The expansion loop with validator"""
-        for i in range(retries):
+    async def _write_with_ai_scoring(self, section, domain_rules: str, max_retries=2) -> Slide:
+        """Stage 2 + 3: Expansion with Confidence Scoring Retry Loop"""
+        for i in range(max_retries):
             try:
+                # generate
                 content = await self.writer.generate_slide(
                     section.section_title, 
                     section.what_to_cover, 
+                    domain_rules=domain_rules,
                     is_retry=(i > 0)
                 )
                 slide_json = json.loads(content)
+                title = slide_json["title"]
+                points = slide_json["bullet_points"]
+
+                # score 1: Fast keyword check
+                if not Validator.is_valid_slide_text(title, points):
+                    logger.warning(f"Keyword check failed for '{title}', retrying...")
+                    continue
+
+                # score 2: AI Confidence score
+                score = await Validator.get_confidence_score(self.client, title, points)
+                if score >= 75:
+                    logger.info(f"Slide '{title}' passed with score {score}")
+                    return Slide(title=title, points=points)
                 
-                if Validator.is_valid_slide(slide_json):
-                    return Slide(title=slide_json["title"], points=slide_json["bullet_points"])
-                
-                logger.warning(f"Low-quality slide detected for '{section.section_title}', retry {i+1}...")
+                logger.warning(f"Low AI score ({score}) for '{title}', retrying {i+1}...")
             except Exception as e:
-                logger.error(f"Slide expansion error for '{section.section_title}': {e}")
-                
-        # Safe fallback
+                logger.error(f"Expansion loop error: {e}")
+
+        # Fallback
         return Slide(
             title=section.section_title, 
-            points=["Refer to technical documentation for in-depth details.", "Standard implementation protocols apply.", "Evaluate performance based on specific use cases."]
+            points=["Thematic details for this section are being processed.", "Ensure factual accuracy in final review.", "Consult domain-specific resources."]
         )
-
-    def _normalize_prompt(self, user_prompt: str, audience: str) -> str:
-        """Internal prompt engineering based on audience"""
-        if audience == "technical":
-            return f"Create a technical presentation for computer science students. Use formal terminology, explain architecture/mechanisms, and provide data-driven examples. Topic: \"{user_prompt}\""
-        else:
-            return f"Create an easy-to-understand presentation for a general audience. Avoid jargon, use real-world analogies, and keep descriptions simple and engaging. Topic: \"{user_prompt}\""
 
     def _get_mock_response(self, slide_count: int, text: str) -> PresentationStructure:
         topic = text[:40] + "..." if len(text) > 40 else text
@@ -102,7 +130,7 @@ class ContentEngine:
         for i in range(slide_count):
             slides.append({
                 "title": f"Structural Component {i+1} for {topic}",
-                "points": ["Major industry drivers", "Core conceptual overview", "Scope of the discussion"]
+                "points": ["Fact-based overview of component", "Domain-specific mechanism detail", "Case study reference"]
             })
         return PresentationStructure(topic=topic, slides=slides)
 

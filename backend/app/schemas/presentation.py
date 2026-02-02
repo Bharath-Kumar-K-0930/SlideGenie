@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 
 class Slide(BaseModel):
     title: str = Field(description="The title of the slide")
@@ -8,6 +8,14 @@ class Slide(BaseModel):
 class PlanSection(BaseModel):
     section_title: str
     what_to_cover: str
+    suggest_diagram: Optional[str] = None # e.g. "flowchart", "bar_chart"
+
+class Domain(str):
+    GENERAL = "general"
+    TECHNICAL = "technical"
+    MATHEMATICS = "mathematics"
+    LAW = "law"
+    MEDICINE = "medicine"
 
 class ConceptPlan(BaseModel):
     topic: str
