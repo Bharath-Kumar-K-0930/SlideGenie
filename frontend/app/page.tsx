@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import ScrollFloat from "../components/ScrollFloat/ScrollFloat";
+import ScrollReveal from "../components/ScrollReveal/ScrollReveal";
 
 export default function Home() {
   const [text, setText] = useState("");
@@ -182,11 +184,16 @@ export default function Home() {
             <span className="badge badge-secondary">Fast & Easy</span>
           </div>
 
-          <h2 className="mb-md">
-            Turn Your Ideas Into
-            <br />
-            <span className="text-gradient">Professional Presentations</span>
-          </h2>
+          <ScrollReveal
+            baseOpacity={0}
+            enableBlur={true}
+            baseRotation={0}
+            blurStrength={10}
+            as="h1"
+            textClassName="text-with-image"
+          >
+            Turn Your Ideas Into Professional Presentations
+          </ScrollReveal>
 
           <p className="mb-xl" style={{ fontSize: '1.125rem', maxWidth: '600px', margin: '0 auto 2rem' }}>
             Generate stunning PowerPoint and PDF presentations in seconds using advanced AI technology
@@ -238,7 +245,7 @@ export default function Home() {
         <div className="container" style={{ maxWidth: '1100px' }}>
           <div className="grid grid-2 items-start gap-2xl">
             {/* Guide Section */}
-            <div className="fade-in" style={{ padding: 'var(--spacing-md)' }}>
+            <div className="fade-in sticky-guide" style={{ padding: 'var(--spacing-md)' }}>
               <div className="mb-lg">
                 <h3 className="mb-md" style={{ color: 'var(--color-primary)' }}>
                   How to write the content prompt
@@ -325,7 +332,7 @@ export default function Home() {
               {/* Topic Domain */}
               <div className="mb-lg">
                 <label className="label">Topic Domain</label>
-                <div className="toggle-group" style={{ gridTemplateColumns: 'repeat(3, 1fr)', fontSize: '0.8125rem' }}>
+                <div className="toggle-group" style={{ gridTemplateColumns: 'repeat(5, 1fr)', fontSize: '0.75rem' }}>
                   <button onClick={() => setDomain("general")} className={`toggle-option ${domain === "general" ? "active" : ""}`}>🌐 General</button>
                   <button onClick={() => setDomain("technical")} className={`toggle-option ${domain === "technical" ? "active" : ""}`}>💻 Tech</button>
                   <button onClick={() => setDomain("mathematics")} className={`toggle-option ${domain === "mathematics" ? "active" : ""}`}>🔢 Math</button>

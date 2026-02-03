@@ -1,0 +1,79 @@
+/* Base component wrapper */
+.scroll-reveal {
+    margin: 40px 0;
+    overflow: visible;
+    min-height: 1.2em;
+    /* Ensure it has height even if content is hidden */
+}
+
+/* The primary text container */
+.scroll-reveal-text {
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    line-height: 1.1;
+    font-weight: 900;
+    text-align: center;
+    letter-spacing: -0.04em;
+    display: block;
+
+    /* Reveal logic: Start visible to avoid "invisible" bugs if JS fails */
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Individual words - animated by GSAP */
+.word {
+    display: inline-block;
+    margin-right: 0.15em;
+    position: relative;
+    /* We'll handle opacity via GSAP, but let's keep it visible by default */
+    /* opacity: 1; */
+}
+
+/* 
+   REFINED IRIDESCENT EFFECT 
+   Using a mix of colors that matches your brand but with better contrast.
+*/
+.text-with-image {
+    background: linear-gradient(45deg,
+            #ef0d50,
+            #a855f7,
+            #3b82f6,
+            #ef0d50);
+    background-size: 400% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+
+    display: inline-block;
+    width: 100%;
+
+    /* Animation for the gradient */
+    animation: flow 10s ease infinite;
+
+    /* Glow effect */
+    filter: drop-shadow(0 0 10px rgba(239, 13, 80, 0.2));
+}
+
+@keyframes flow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+/* Ensure children inherit the clipping */
+.text-with-image .word {
+    background: inherit;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+}

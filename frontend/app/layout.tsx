@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Space_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
+import RevealProvider from "../components/RevealProvider";
+import ClickSpark from "../components/ClickSpark/ClickSpark";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -48,7 +50,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${spaceGrotesk.variable} ${inter.variable} antialiased`}
       >
-        {children}
+        <RevealProvider>
+          <ClickSpark
+            sparkColor='#ef0d50'
+            sparkSize={10}
+            sparkRadius={20}
+            sparkCount={12}
+            duration={400}
+          >
+            {children}
+          </ClickSpark>
+        </RevealProvider>
       </body>
     </html>
   );
