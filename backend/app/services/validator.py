@@ -8,18 +8,12 @@ logger = logging.getLogger(__name__)
 
 class Validator:
     FORBIDDEN_WORDS = [
+        "phase",
         "overview",
-        "key aspect",
-        "important detail",
-        "implementation strategy",
+        "strategy",
+        "methodology",
         "optimization",
-        "performance metrics",
-        "placeholder",
-        "supporting evidence",
-        "generic concept",
-        "learn more",
-        "specific detail",
-        "vague detail"
+        "critical success"
     ]
 
     @classmethod

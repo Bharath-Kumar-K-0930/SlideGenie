@@ -6,11 +6,10 @@ class SlideWriter:
     def __init__(self, client: AsyncOpenAI):
         self.client = client
 
-    async def generate_slide(self, section_title: str, what_to_cover: str, domain_rules: str = "", is_retry: bool = False):
+    async def generate_slide(self, slide_title: str, slide_focus: str, is_retry: bool = False):
         prompt = SLIDE_CONTENT_PROMPT.format(
-            section_title=section_title,
-            what_to_cover=what_to_cover,
-            domain_rules=domain_rules
+            slide_title=slide_title,
+            slide_focus=slide_focus
         )
         
         if is_retry:

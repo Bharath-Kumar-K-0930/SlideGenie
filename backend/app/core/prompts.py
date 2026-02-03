@@ -1,26 +1,26 @@
 # --- CORE PIPELINE PROMPTS ---
 
-CONCEPT_PLANNER_PROMPT = """You are a subject-matter expert and curriculum designer.
+CONCEPT_PLANNER_PROMPT = """You are an expert educator and presentation planner.
 
-TASK:
-Break the given topic into a clear, logical presentation outline suitable for a {slide_count}-slide PowerPoint presentation.
+Analyze the topic and create a PowerPoint slide outline.
 
 RULES:
-1. Do NOT generate slide content.
-2. Do NOT use generic terms like "Key Aspect", "Overview", or "Implementation Strategy".
-3. Each section must be specific and directly related to the topic.
-4. The outline must follow a natural learning flow.
-5. Provide EXACTLY {slide_count} sections.
-6. For each section, suggest if a visual element (flowchart, bar_chart, pie_chart, timeline) would be beneficial.
+- Create EXACTLY {slide_count} slides
+- Each slide must cover a DIFFERENT concept
+- Use clear, specific slide titles
+- Avoid generic terms like "overview", "phase", "strategy"
+- Follow a logical learning order
 
-OUTPUT FORMAT (STRICT JSON):
+TOPIC:
+{user_topic}
+
+OUTPUT FORMAT (JSON ONLY):
 {{
-  "topic": "string",
-  "sections": [
+  "slides": [
     {{
-      "section_title": "string",
-      "what_to_cover": "1–2 sentence description of specific facts and details to include",
-      "suggest_diagram": "flowchart | bar_chart | pie_chart | timeline | null"
+      "slide_number": 1,
+      "title": "Slide title",
+      "focus": "What this slide should explain"
     }}
   ]
 }}
@@ -28,28 +28,26 @@ OUTPUT FORMAT (STRICT JSON):
 
 SLIDE_CONTENT_PROMPT = """You are a professional presentation writer.
 
-TASK:
-Create PowerPoint slide content for the following section.
+Create content for ONE PowerPoint slide.
+
+SLIDE TITLE:
+{slide_title}
+
+SLIDE FOCUS:
+{slide_focus}
 
 RULES:
-1. Output ONLY valid JSON.
-2. Slide title must match the section title exactly.
-3. Bullet points must be factual, specific, and non-generic.
-4. Each bullet point: max 12 words.
-5. No filler text. No vague phrases like "Important detail" or "Learn more".
-{domain_rules}
+- 3 to 5 bullet points
+- Max 12 words per bullet
+- Clear and factual
+- Beginner-friendly
+- No repetition
+- No generic phrases
 
-SECTION TITLE:
-{section_title}
-
-WHAT TO COVER:
-{what_to_cover}
-
-OUTPUT FORMAT (STRICT JSON):
+OUTPUT FORMAT (JSON ONLY):
 {{
-  "title": "{section_title}",
+  "title": "string",
   "bullet_points": [
-    "string",
     "string",
     "string"
   ]

@@ -70,18 +70,14 @@ class ContentEngine:
             # 3. Topic Planner Phase
             plan_content = await self.planner.generate_outline(enhanced_text, slide_count)
             concept_plan = ConceptPlan(**json.loads(plan_content))
-            logger.info(f"Planned Domain: {domain} | Topic: {concept_plan.topic}")
+            logger.info(f"Planned Topic: {enhanced_text}")
 
             # 4. Slide Expansion + 5. Validation/Scoring (Parallel)
-            tasks = [self._write_with_ai_scoring(section, domain_rules) for section in concept_plan.sections]
+            tasks = [self._write_with_ai_scoring(slide_plan) for slide_plan in concept_plan.slides]
             slides = await asyncio.gather(*tasks)
             
-            # 6. Visual Element Planning (Optional extra layer)
-            # In a full PROD version, we would map diagrams to specific slides
-            # For this version, we'll keep the structure clean
-            
             presentation = PresentationStructure(
-                topic=concept_plan.topic,
+                topic=enhanced_text,
                 slides=slides
             )
 
@@ -91,14 +87,13 @@ class ContentEngine:
             logger.error(f"Ultimate Pipeline Orchestration Error: {e}")
             raise e
 
-    async def _write_with_ai_scoring(self, section, domain_rules: str, max_retries=3) -> Slide:
+    async def _write_with_ai_scoring(self, slide_plan, max_retries=3) -> Slide:
         """The expansion loop with Validator + Confidence Scoring"""
         for i in range(max_retries):
             try:
                 content = await self.writer.generate_slide(
-                    section.section_title, 
-                    section.what_to_cover, 
-                    domain_rules=domain_rules,
+                    slide_plan.title, 
+                    slide_plan.focus, 
                     is_retry=(i > 0)
                 )
                 slide_json = json.loads(content)
@@ -116,10 +111,8 @@ class ContentEngine:
                     logger.info(f"Slide '{title}' PASSED with score {score}")
                     
                     # FETCH DYNAMIC IMAGE (Silent Power Feature)
-                    # Using Unsplash source for dynamic, topic-specific high-quality photos
                     image_query = title.replace(" ", "%20")
-                    image_url = f"https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=1000" # fallback
-                    # In a more advanced version, we'd search first. For now, we'll use a descriptive curated random
+                    # Using Unsplash source for dynamic, topic-specific high-quality photos
                     image_url = f"https://source.unsplash.com/featured/?{image_query}"
                     
                     return Slide(title=title, points=points, image_url=image_url)
@@ -130,7 +123,7 @@ class ContentEngine:
                 
         # Safe Fallback (Enterprise-ready)
         return Slide(
-            title=section.section_title, 
+            title=slide_plan.title, 
             points=[
                 "Comprehensive details for this section are available in the supplementary material.",
                 "Strategic alignment with core project objectives.",

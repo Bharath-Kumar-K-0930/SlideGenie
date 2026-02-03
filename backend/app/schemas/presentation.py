@@ -6,10 +6,10 @@ class Slide(BaseModel):
     points: List[str] = Field(description="List of bullet points for the slide", max_length=5)
     image_url: Optional[str] = Field(default=None, description="Optional URL for a slide image")
 
-class PlanSection(BaseModel):
-    section_title: str
-    what_to_cover: str
-    suggest_diagram: Optional[str] = None # e.g. "flowchart", "bar_chart"
+class SlidePlan(BaseModel):
+    slide_number: int
+    title: str
+    focus: str
 
 class Domain(str):
     GENERAL = "general"
@@ -19,8 +19,7 @@ class Domain(str):
     MEDICINE = "medicine"
 
 class ConceptPlan(BaseModel):
-    topic: str
-    sections: List[PlanSection]
+    slides: List[SlidePlan]
 
 class PresentationStructure(BaseModel):
     topic: str = Field(description="The main topic of the presentation")

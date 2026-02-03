@@ -133,18 +133,18 @@ export default function PreviewPage() {
                             flexDirection: 'column'
                         }}>
                             <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary)', marginBottom: 'var(--spacing-md)' }}>
-                                {generatedData.structure.slides[activeSlide].title}
+                                {generatedData.structure.slides[activeSlide]?.title}
                             </h3>
                             <div className="flex gap-lg" style={{ flex: 1 }}>
                                 <ul style={{ flex: 2, paddingLeft: 'var(--spacing-lg)' }}>
-                                    {generatedData.structure.slides[activeSlide].points.map((p: string, i: number) => (
+                                    {generatedData.structure.slides[activeSlide]?.points?.map((p: string, i: number) => (
                                         <li key={i} style={{ fontSize: '0.875rem', marginBottom: 'var(--spacing-xs)' }}>{p}</li>
                                     ))}
                                 </ul>
-                                {generatedData.structure.slides[activeSlide].image_url && (
+                                {generatedData.structure.slides[activeSlide]?.image_url && (
                                     <div style={{ flex: 1.5, position: 'relative', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
                                         <img
-                                            src={generatedData.structure.slides[activeSlide].image_url}
+                                            src={generatedData.structure.slides[activeSlide]?.image_url}
                                             alt="Slide visual"
                                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         />

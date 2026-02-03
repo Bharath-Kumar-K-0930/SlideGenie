@@ -207,6 +207,20 @@ p {
   border-color: var(--color-primary);
 }
 
+.btn-text {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-text-primary);
+  box-shadow: none;
+  padding: 0.5rem 1rem;
+}
+
+.btn-text:hover {
+  color: var(--color-primary);
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
 .btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
