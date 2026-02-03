@@ -1,23 +1,22 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import ScrollFloat from "../components/ScrollFloat/ScrollFloat";
 import ScrollReveal from "../components/ScrollReveal/ScrollReveal";
 
 export default function Home() {
+  const router = useRouter();
   const [text, setText] = useState("");
   const [slideCount, setSlideCount] = useState(5);
   const [type, setType] = useState<"pptx" | "pdf">("pptx");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [audience, setAudience] = useState<"general" | "technical">("general");
   const [domain, setDomain] = useState<"general" | "technical" | "mathematics" | "law" | "medicine">("general");
   const [improvingPrompt, setImprovingPrompt] = useState(false);
-  const [generatedData, setGeneratedData] = useState<any>(null);
-  const [activeSlide, setActiveSlide] = useState(0);
 
   useEffect(() => {
     const theme = localStorage.getItem("theme");
@@ -70,7 +69,6 @@ export default function Home() {
     }
 
     setError("");
-    setSuccess(false);
     setLoading(true);
 
     try {
@@ -87,32 +85,19 @@ export default function Home() {
       }
 
       const data = await response.json();
-      setGeneratedData(data.data);
-      setSuccess(true);
-      setActiveSlide(0);
+
+      // Save data for the preview page
+      localStorage.setItem("generatedPresentation", JSON.stringify(data.data));
+
+      // Redirect to preview page
+      router.push("/preview");
+
     } catch (err: any) {
       setError(err.message || "Something went wrong");
       setTimeout(() => setError(""), 5000);
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDownload = () => {
-    if (!generatedData) return;
-
-    const link = document.createElement("a");
-    link.href = `data:${generatedData.contentType};base64,${generatedData.fileBase64}`;
-    link.download = generatedData.filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const handleRedesign = () => {
-    setGeneratedData(null);
-    setSuccess(false);
-    setActiveSlide(0);
   };
 
   const charCount = text.length;
@@ -436,73 +421,6 @@ export default function Home() {
                 </div>
               )}
 
-              {/* Preview & Success State */}
-              {generatedData && (
-                <div style={{ marginTop: 'var(--spacing-xl)' }}>
-                  <div className="card" style={{ padding: 'var(--spacing-lg)', background: 'var(--color-bg-secondary)', border: '2px solid var(--color-primary)' }}>
-                    <div className="flex items-center justify-between mb-md">
-                      <h4 style={{ margin: 0 }}>Slide Preview ({activeSlide + 1} / {generatedData.structure.slides.length})</h4>
-                      <div className="flex gap-sm">
-                        <button
-                          onClick={() => setActiveSlide(Math.max(0, activeSlide - 1))}
-                          className="btn btn-secondary btn-sm"
-                          disabled={activeSlide === 0}
-                        >
-                          ←
-                        </button>
-                        <button
-                          onClick={() => setActiveSlide(Math.min(generatedData.structure.slides.length - 1, activeSlide + 1))}
-                          className="btn btn-secondary btn-sm"
-                          disabled={activeSlide === generatedData.structure.slides.length - 1}
-                        >
-                          →
-                        </button>
-                      </div>
-                    </div>
-
-                    <div style={{
-                      aspectRatio: '16/9',
-                      background: 'var(--color-bg)',
-                      borderRadius: 'var(--radius-md)',
-                      padding: 'var(--spacing-lg)',
-                      boxShadow: 'inset 0 0 10px rgba(0,0,0,0.1)',
-                      position: 'relative',
-                      overflow: 'hidden',
-                      display: 'flex',
-                      flexDirection: 'column'
-                    }}>
-                      <h3 style={{ fontSize: '1.25rem', color: 'var(--color-primary)', marginBottom: 'var(--spacing-md)' }}>
-                        {generatedData.structure.slides[activeSlide].title}
-                      </h3>
-                      <div className="flex gap-lg" style={{ flex: 1 }}>
-                        <ul style={{ flex: 2, paddingLeft: 'var(--spacing-lg)' }}>
-                          {generatedData.structure.slides[activeSlide].points.map((p: string, i: number) => (
-                            <li key={i} style={{ fontSize: '0.875rem', marginBottom: 'var(--spacing-xs)' }}>{p}</li>
-                          ))}
-                        </ul>
-                        {generatedData.structure.slides[activeSlide].image_url && (
-                          <div style={{ flex: 1.5, position: 'relative', borderRadius: 'var(--radius-sm)', overflow: 'hidden' }}>
-                            <img
-                              src={generatedData.structure.slides[activeSlide].image_url}
-                              alt="Slide visual"
-                              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid grid-2 gap-md" style={{ marginTop: 'var(--spacing-lg)' }}>
-                      <button onClick={handleDownload} className="btn btn-primary">
-                        📥 Download {generatedData.filename.endsWith('.pdf') ? 'PDF' : 'PPTX'}
-                      </button>
-                      <button onClick={handleRedesign} className="btn btn-secondary">
-                        🎨 Redesign / Edit
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         </div>

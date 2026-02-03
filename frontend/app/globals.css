@@ -283,6 +283,7 @@ p {
 .sticky-guide {
   position: sticky;
   top: 2rem;
+  z-index: 10;
 }
 
 .badge-primary {
@@ -698,7 +699,14 @@ p {
   .grid-2,
   .grid-3,
   .grid-4 {
-    grid-template-columns: 1fr;
+    grid-template-columns: 100%;
+    gap: var(--spacing-xl);
+  }
+
+  .sticky-guide {
+    position: relative;
+    top: auto;
+    margin-bottom: var(--spacing-xl);
   }
 }
 
